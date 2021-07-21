@@ -1,14 +1,16 @@
 # Projet P2
-# Version 2 utilisant une fonction infobook pour récupérer toutes les data liées à un livre
-# la fonction prend pour argument l'url de la page web correspondant au livre recherché
+# Version 3
+# Boucle sur la liste des catégories de livres identifiée via BeautifulSoup
+# Pour chaque catégorie, on appelle la fonction listebooks() de la v2
+# Et la fonction listebooks() appelle elle-même chaque livre de la catégorie via la fonction infobook()
 
 # importation des modules nécessaires à l'ETL
 from requests import get
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 import csv
+import re
 
-numero_page = 1
 
 def listebooks(url):
     # recense l'url associée à chaque page web de description d'un livre de la catégorie
@@ -25,18 +27,15 @@ def listebooks(url):
         numero_page = 0
 
 
-    
-
-
-
 
 def infobook(url):
     # utilisation du package BeautifulSoup pour récupérer le contenu parsé de la page HTML
     # récupération des différentes infos du livre via les méthodes de BeautifulSoup
     # il est parfois nécessaire de récupérer une valeur dans une balise qui suit une balise dont la valeur est connue
-
+    global nom_cat
     page = get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
+    
     product_page_url.append(url)
     universal_product_code.append(soup.find("th", text = "UPC").find_next("td").text)
     title.append(soup.find("title").text.split("|")[0].strip())
@@ -51,8 +50,8 @@ def infobook(url):
     review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
     review_rating.append(dico_number[review_rating_texte])
     image_url.append(urljoin(url, soup.find("img")["src"]))
-    # création du fichier csv
-    with open('P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
+    # écriture dans le fichier csv
+    with open(f'P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
         writer = csv.writer(fichier_csv, delimiter=',')
         writer.writerow(liste_en_tetes)
         for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10 in zip(product_page_url,
@@ -71,17 +70,7 @@ def infobook(url):
 # dictionnaire de correspondance nombre texte/valeur
 dico_number = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
 
-# création sous forme de listes des variables correspondant aux champs requis
-product_page_url = []
-universal_product_code = []
-title = []
-price_including_tax = []
-price_excluding_tax = []
-number_available = []
-product_description = []
-category = []
-review_rating = []
-image_url = []
+
 
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
@@ -98,19 +87,44 @@ liste_en_tetes.extend([
     "image_url",
     ])
 
-# aller chercher page correspondant à une catégorie de livres
-# on débute par la page 1 identifiée comme 'index'
-# si il y a plusieurs pages web de la même catégorie, on remplacera 'index' par 'page-x'
-
-while numero_page != 0:
-    if numero_page == 1:
-        suffixe = "index"
-    else:
-        suffixe = "page-" + str(numero_page)
-    url_cat = f"http://books.toscrape.com/catalogue/category/books/classics_6/{suffixe}.html"
-    listebooks(url_cat)
 
 
+# on récupère dans la page 'home' la liste des catégories de livres
+# le programme va itérer sur cette liste
+
+url_allcat = "http://books.toscrape.com"
+page_allcat = get(url_allcat)
+soup_allcat = BeautifulSoup(page_allcat.content, 'html.parser')
+liste_allcat = soup_allcat.find_all("a", href = re.compile("catalogue/category/books/"))
+
+for i in liste_allcat:
+    numero_page = 1
+    nom_cat = i["href"].split("/")[3]
+    # création sous forme de listes des variables correspondant aux champs requis
+    product_page_url = []
+    universal_product_code = []
+    title = []
+    price_including_tax = []
+    price_excluding_tax = []
+    number_available = []
+    product_description = []
+    category = []
+    review_rating = []
+    image_url = []
+    # on débute par la page 1 identifiée comme 'index'
+    # si il y a plusieurs pages web de la même catégorie, on remplacera 'index' par 'page-x'
+    while numero_page != 0:
+        if numero_page == 1:
+            suffixe = "index"
+        else:
+            suffixe = "page-" + str(numero_page)
+        url_cat = f"http://books.toscrape.com/catalogue/category/books/{nom_cat}/{suffixe}.html"
+        listebooks(url_cat)
+        print(f"url_cat dans __main__ = {url_cat}")
+
+    
+    
+    
 
 
 
