@@ -1,13 +1,15 @@
 # Premiers éléments du script P2
 
 # importation des modules nécessaires à l'ETL
+import urllib.request
 from requests import get
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from urllib.request import urlretrieve
 import csv
 
 # récupération dans une variable de l'url de la page HTML à traiter
-url = "http://books.toscrape.com/catalogue/our-band-could-be-your-life-scenes-from-the-american-indie-underground-1981-1991_985/index.html"
+url = "http://books.toscrape.com/catalogue/pet-sematary_726/index.html"
 
 # utilisation du package BeautifulSoup pour récupérer le contenu parsé de la page HTML
 page = get(url)
@@ -28,6 +30,9 @@ category = []
 review_rating = []
 image_url = []
 
+# enregistrement du fichier image du livre dans une liste
+liste_file_images = []
+
 
 # récupération des différentes infos du livre via les méthodes de BeautifulSoup
 # il est parfois nécessaire de récupérer une valeur dans une balise qui suit une balise dont la valeur est connue
@@ -47,6 +52,12 @@ category.append(soup.find("a", text = "Books").find_next("a").text)
 review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
 review_rating.append(dico_number[review_rating_texte])
 image_url.append(urljoin(url, soup.find("img")["src"]))
+
+nom_image = soup.find("img")["alt"]
+
+# récupération du fichier image
+liste_file_images.append(urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]),nom_image + ".jpg"))
+
 
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
@@ -81,3 +92,6 @@ with open('P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
         ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
         writer.writerow(ligne)
     
+
+
+print(liste_file_images)
