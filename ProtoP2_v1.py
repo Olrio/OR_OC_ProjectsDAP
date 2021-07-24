@@ -7,9 +7,11 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin
 from urllib.request import urlretrieve
 import csv
+import os
 
 # récupération dans une variable de l'url de la page HTML à traiter
-url = "http://books.toscrape.com/catalogue/pet-sematary_726/index.html"
+url = "http://books.toscrape.com/catalogue/hyperbole-and-a-half-unfortunate-situations-flawed-coping-mechanisms-mayhem-and-other-things-that-happened_702/index.html"
+
 
 # utilisation du package BeautifulSoup pour récupérer le contenu parsé de la page HTML
 page = get(url)
@@ -55,10 +57,6 @@ image_url.append(urljoin(url, soup.find("img")["src"]))
 
 nom_image = soup.find("img")["alt"]
 
-# récupération du fichier image
-liste_file_images.append(urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]),nom_image + ".jpg"))
-
-
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
 liste_en_tetes.extend([
@@ -74,8 +72,18 @@ liste_en_tetes.extend([
     "image_url",
     ])
 
+#création d'un répertoire correspondant à la catégorie explorée
+# on y stocke le fichier csv avec les infos du livre
+# et le fichier image du livre
+repcat = category[-1]
+os.makedirs(repcat, exist_ok=True)
+
+# récupération du fichier image
+file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]),f"{repcat}/{nom_image}.jpg")
+liste_file_images.append(file_images)
+
 # création du fichier csv
-with open('P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
+with open(f'{repcat}/P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
     writer = csv.writer(fichier_csv, delimiter=',')
     writer.writerow(liste_en_tetes)
 
@@ -92,6 +100,3 @@ with open('P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
         ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
         writer.writerow(ligne)
     
-
-
-print(liste_file_images)
