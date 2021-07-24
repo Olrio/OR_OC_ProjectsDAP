@@ -10,7 +10,7 @@ import csv
 import os
 
 # récupération dans une variable de l'url de la page HTML à traiter
-url = "http://books.toscrape.com/catalogue/hyperbole-and-a-half-unfortunate-situations-flawed-coping-mechanisms-mayhem-and-other-things-that-happened_702/index.html"
+url = "http://books.toscrape.com/catalogue/red-hoodarsenal-vol-1-open-for-business-red-hoodarsenal-1_729/index.html"
 
 
 # utilisation du package BeautifulSoup pour récupérer le contenu parsé de la page HTML
@@ -56,7 +56,12 @@ review_rating.append(dico_number[review_rating_texte])
 image_url.append(urljoin(url, soup.find("img")["src"]))
 
 nom_image = soup.find("img")["alt"]
-
+try:
+    nom_image = nom_image.replace("/#", "_")
+except:
+    pass
+print(type(nom_image))
+print(nom_image)
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
 liste_en_tetes.extend([
