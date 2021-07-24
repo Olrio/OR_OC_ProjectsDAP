@@ -5,10 +5,13 @@
 # Et la fonction listebooks() appelle elle-même chaque livre de la catégorie via la fonction infobook()
 
 # importation des modules nécessaires à l'ETL
+import urllib.request
 from requests import get
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from urllib.request import urlretrieve
 import csv
+import os
 import re
 
 
@@ -47,11 +50,31 @@ def infobook(url):
     except AttributeError:
         product_description.append("")
     category.append(soup.find("a", text = "Books").find_next("a").text)
+
+    # création d'un répertoire correspondant à la catégorie explorée (si il n'existe pas)
+    # on y stocke le fichier csv avec les infos du livre
+    # et le fichier image du livre
+    repcat = category[-1]
+    os.makedirs(repcat, exist_ok=True)
+
     review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
     review_rating.append(dico_number[review_rating_texte])
     image_url.append(urljoin(url, soup.find("img")["src"]))
+
+    nom_image = soup.find("img")["alt"]
+
+    # récupération du fichier image
+    print(nom_image)
+    try:
+        nom_image = nom_image.replace("/", "_")
+    except:
+        pass
+    print(nom_image)
+    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"{repcat}/{nom_image}.jpg")
+    liste_file_images.append(file_images)
+
     # écriture dans le fichier csv
-    with open(f'P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
+    with open(f'{repcat}/P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
         writer = csv.writer(fichier_csv, delimiter=',')
         writer.writerow(liste_en_tetes)
         for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10 in zip(product_page_url,
@@ -111,6 +134,10 @@ for i in liste_allcat:
     category = []
     review_rating = []
     image_url = []
+
+    # enregistrement du fichier image du livre dans une liste
+    liste_file_images = []
+
     # on débute par la page 1 identifiée comme 'index'
     # si il y a plusieurs pages web de la même catégorie, on remplacera 'index' par 'page-x'
     while numero_page != 0:
