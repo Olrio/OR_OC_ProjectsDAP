@@ -3,10 +3,13 @@
 # la fonction prend pour argument l'url de la page web correspondant au livre recherché
 
 # importation des modules nécessaires à l'ETL
+import urllib.request
 from requests import get
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
+from urllib.request import urlretrieve
 import csv
+import os
 
 numero_page = 1
 
@@ -48,11 +51,24 @@ def infobook(url):
     except AttributeError:
         product_description.append("")
     category.append(soup.find("a", text = "Books").find_next("a").text)
+    # création d'un répertoire correspondant à la catégorie explorée (si il n'existe pas)
+    # on y stocke le fichier csv avec les infos du livre
+    # et le fichier image du livre
+    repcat = category[-1]
+    os.makedirs(repcat, exist_ok=True)
     review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
     review_rating.append(dico_number[review_rating_texte])
     image_url.append(urljoin(url, soup.find("img")["src"]))
+
+    nom_image = soup.find("img")["alt"]
+
+    # récupération du fichier image
+    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"{repcat}/{nom_image}.jpg")
+    liste_file_images.append(file_images)
+
+
     # création du fichier csv
-    with open('P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
+    with open(f'{repcat}/P2books.csv', 'w', encoding = 'utf8') as fichier_csv:
         writer = csv.writer(fichier_csv, delimiter=',')
         writer.writerow(liste_en_tetes)
         for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10 in zip(product_page_url,
@@ -83,6 +99,9 @@ category = []
 review_rating = []
 image_url = []
 
+# enregistrement du fichier image du livre dans une liste
+liste_file_images = []
+
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
 liste_en_tetes.extend([
@@ -107,7 +126,7 @@ while numero_page != 0:
         suffixe = "index"
     else:
         suffixe = "page-" + str(numero_page)
-    url_cat = f"http://books.toscrape.com/catalogue/category/books/classics_6/{suffixe}.html"
+    url_cat = f"http://books.toscrape.com/catalogue/category/books/horror_31/{suffixe}.html"
     listebooks(url_cat)
 
 
