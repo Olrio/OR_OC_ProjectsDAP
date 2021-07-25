@@ -69,15 +69,15 @@ def infobook(url):
         nom_image = nom_image.replace("/", "_")
     except:
         pass
-    print(nom_image)
     file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"{repcat}/{nom_image}.jpg")
-    liste_file_images.append(file_images)
+    liste_file_images.append(os.path.join(os.getcwd(), file_images[0]))
+
 
     # écriture dans le fichier csv
     with open(f'{repcat}/P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
         writer = csv.writer(fichier_csv, delimiter=',')
         writer.writerow(liste_en_tetes)
-        for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10 in zip(product_page_url,
+        for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 in zip(product_page_url,
                                                        universal_product_code,
                                                        title,
                                                        price_including_tax,
@@ -86,8 +86,10 @@ def infobook(url):
                                                        product_description,
                                                        category,
                                                        review_rating,
-                                                       image_url):
-            ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+                                                       image_url,
+                                                                liste_file_images
+                                                                ):
+            ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11]
             writer.writerow(ligne)
 
 # dictionnaire de correspondance nombre texte/valeur
@@ -108,6 +110,7 @@ liste_en_tetes.extend([
     "category",
     "review_rating",
     "image_url",
+    "file_image"
     ])
 
 
