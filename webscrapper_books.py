@@ -4,15 +4,15 @@
 # Pour chaque catégorie, on appelle la fonction listebooks() de la v2
 # Et la fonction listebooks() appelle elle-même chaque livre de la catégorie via la fonction infobook()
 
-# importation des modules nécessaires à l'ETL
-import urllib.request
-from requests import get
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-from urllib.request import urlretrieve
 import csv
 import os
 import re
+# importation des modules nécessaires à l'ETL
+import urllib.request
+from urllib.parse import urljoin
+
+from bs4 import BeautifulSoup
+from requests import get
 
 
 def listebooks(url):
@@ -55,7 +55,7 @@ def infobook(url):
     # on y stocke le fichier csv avec les infos du livre
     # et le fichier image du livre
     repcat = category[-1]
-    os.makedirs(repcat, exist_ok=True)
+    os.makedirs("./Webscrapper/" + repcat, exist_ok=True)
 
     review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
     review_rating.append(dico_number[review_rating_texte])
@@ -69,12 +69,12 @@ def infobook(url):
         nom_image = nom_image.replace("/", "_")
     except:
         pass
-    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"{repcat}/{nom_image}.jpg")
+    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"./Webscrapper/{repcat}/{nom_image}.jpg")
     liste_file_images.append(os.path.join(os.getcwd(), file_images[0]))
 
 
     # écriture dans le fichier csv
-    with open(f'{repcat}/P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
+    with open(f'./Webscrapper/{repcat}/P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
         writer = csv.writer(fichier_csv, delimiter=',')
         writer.writerow(liste_en_tetes)
         for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 in zip(product_page_url,
