@@ -10,26 +10,25 @@ import re
 # importation des modules nécessaires à l'ETL
 import urllib.request
 from urllib.parse import urljoin
-
 from bs4 import BeautifulSoup
 from requests import get
 
 
 def listebooks(url):
     # recense l'url associée à chaque page web de description d'un livre de la catégorie
-    global numero_page
-    page_cat = get(url_cat)
+    # si il y a plusieurs pages web pour cette catégorie, la fonction boucle récursivement
+    page_cat = get(url)
     soup_cat = BeautifulSoup(page_cat.content, 'html.parser')
     liste_cat_books = soup_cat.find_all("article")
     for i in liste_cat_books:
-        url_book = urljoin(url_cat, i.find("a")["href"])
+        url_book = urljoin(url, i.find("a")["href"])
         infobook(url_book)
     if (soup_cat.find("li", class_="next")):
-        numero_page += 1
+        suffixe = soup_cat.find("li", class_="next").find_next("a")["href"]
+        url_cat = f"http://books.toscrape.com/catalogue/category/books/{nom_cat}/{suffixe}"
+        listebooks(url_cat)
     else:
-        numero_page = 0
-
-
+        return
 
 def infobook(url):
     # utilisation du package BeautifulSoup pour récupérer le contenu parsé de la page HTML
@@ -51,12 +50,6 @@ def infobook(url):
         product_description.append("")
     category.append(soup.find("a", text = "Books").find_next("a").text)
 
-    # création d'un répertoire correspondant à la catégorie explorée (si il n'existe pas)
-    # on y stocke le fichier csv avec les infos du livre
-    # et le fichier image du livre
-    repcat = category[-1]
-    os.makedirs("./Webscrapper/" + repcat, exist_ok=True)
-
     review_rating_texte = soup.find("p", {'class': lambda x: "star-rating" in x.split()})["class"].pop()
     review_rating.append(dico_number[review_rating_texte])
     image_url.append(urljoin(url, soup.find("img")["src"]))
@@ -64,38 +57,17 @@ def infobook(url):
     nom_image = soup.find("img")["alt"]
 
     # récupération du fichier image
-    print(nom_image)
+
     try:
         nom_image = nom_image.replace("/", "_")
     except:
         pass
-    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"./Webscrapper/{repcat}/{nom_image}.jpg")
+    file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]), f"./Webscrapper/{nom_cat}/{nom_image}.jpg")
     liste_file_images.append(os.path.join(os.getcwd(), file_images[0]))
 
 
-    # écriture dans le fichier csv
-    with open(f'./Webscrapper/{repcat}/P2books_{nom_cat}.csv', 'w', encoding = 'utf8') as fichier_csv:
-        writer = csv.writer(fichier_csv, delimiter=',')
-        writer.writerow(liste_en_tetes)
-        for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 in zip(product_page_url,
-                                                       universal_product_code,
-                                                       title,
-                                                       price_including_tax,
-                                                       price_excluding_tax,
-                                                       number_available,
-                                                       product_description,
-                                                       category,
-                                                       review_rating,
-                                                       image_url,
-                                                                liste_file_images
-                                                                ):
-            ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11]
-            writer.writerow(ligne)
-
 # dictionnaire de correspondance nombre texte/valeur
 dico_number = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
-
-
 
 # toutes les variables ci-dessus devront constituer les en-têtes d'un fichier csv
 liste_en_tetes = []
@@ -114,7 +86,6 @@ liste_en_tetes.extend([
     ])
 
 
-
 # on récupère dans la page 'home' la liste des catégories de livres
 # le programme va itérer sur cette liste
 
@@ -124,8 +95,11 @@ soup_allcat = BeautifulSoup(page_allcat.content, 'html.parser')
 liste_allcat = soup_allcat.find_all("a", href = re.compile("catalogue/category/books/"))
 
 for i in liste_allcat:
-    numero_page = 1
     nom_cat = i["href"].split("/")[3]
+    # création d'un répertoire correspondant à la catégorie explorée (si il n'existe pas)
+    # on y stocke le fichier csv avec les infos du livre
+    # et le fichier image du livre
+    os.makedirs("./Webscrapper/" + nom_cat, exist_ok=True)
     # création sous forme de listes des variables correspondant aux champs requis
     product_page_url = []
     universal_product_code = []
@@ -143,22 +117,25 @@ for i in liste_allcat:
 
     # on débute par la page 1 identifiée comme 'index'
     # si il y a plusieurs pages web de la même catégorie, on remplacera 'index' par 'page-x'
-    while numero_page != 0:
-        if numero_page == 1:
-            suffixe = "index"
-        else:
-            suffixe = "page-" + str(numero_page)
-        url_cat = f"http://books.toscrape.com/catalogue/category/books/{nom_cat}/{suffixe}.html"
-        listebooks(url_cat)
-        print(f"url_cat dans __main__ = {url_cat}")
+    suffixe = "index"
+    url_cat = f"http://books.toscrape.com/catalogue/category/books/{nom_cat}/{suffixe}.html"
+    listebooks(url_cat)
 
-    
-    
-    
-
-
-
-
-
-
- 
+    # écriture dans le fichier csv
+    with open(f'./Webscrapper/{nom_cat}/P2books_{nom_cat}.csv', 'w', encoding='utf8') as fichier_csv:
+        writer = csv.writer(fichier_csv, delimiter=',')
+        writer.writerow(liste_en_tetes)
+        for c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11 in zip(product_page_url,
+                                                                universal_product_code,
+                                                                title,
+                                                                price_including_tax,
+                                                                price_excluding_tax,
+                                                                number_available,
+                                                                product_description,
+                                                                category,
+                                                                review_rating,
+                                                                image_url,
+                                                                liste_file_images
+                                                                ):
+            ligne = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11]
+            writer.writerow(ligne)
