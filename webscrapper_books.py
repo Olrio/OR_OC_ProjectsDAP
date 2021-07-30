@@ -71,7 +71,7 @@ def infobook(url):
 
     file_images = urllib.request.urlretrieve(urljoin(url, soup.find("img")["src"]),
                                              f"./Webscrapper/{nom_cat}/{nom_image}.jpg")
-    dicobook["liste_file_images"] = os.path.join(os.getcwd(), file_images[0])
+    dicobook["liste_file_images"] = '"'+os.path.join(os.getcwd(), file_images[0])+'"'
     return dicobook
 
 
