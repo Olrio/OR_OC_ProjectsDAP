@@ -2,7 +2,7 @@
 
 ### Présentation du script
 
-Le programme webs_craper_books.py utilise la technique de Web scraping pour le site [books.toscrape.com](http://books.toscrape.com).  
+Le programme web_scraper_books.py utilise la technique de Web scraping pour le site [books.toscrape.com](http://books.toscrape.com).  
 
 Le script parcourt toutes les catégories de livres du site.  
 
