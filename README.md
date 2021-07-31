@@ -10,10 +10,10 @@ Pour chaque catégorie, il parcourt la page web de chaque livre de la catégorie
 
 Les informations extraites sont enregistrées dans un fichier csv à raison d'un fichier csv par catégorie.  
 
-Un répertoire est créé dans le répertoire de travail d el'utilisateur pour chaque catégorie de livres.  
+Un répertoire est créé dans le répertoire de travail de l'utilisateur pour chaque catégorie de livres.  
 
 Sont enregistrés dans ce répertoire :
-* le fichier csv avec les datas de tous les livres de la catégorie
+* le fichier csv avec les data de tous les livres de la catégorie
 * le fichier image de chaque livre de la catégorie
       
 ### Création et activation d'un environnement virtuel
