@@ -105,9 +105,9 @@ def create_csv(dictionary, name):
 
 def main():
     # main function of the program
-    url_home = "http://books.toscrape.com"
-    page_categories = get(url_home)
-    url_categories = get_url_categories(page_categories, url_home)
+    URL_HOME = "http://books.toscrape.com"
+    page_categories = get(URL_HOME)
+    url_categories = get_url_categories(page_categories, URL_HOME)
     for url_category in url_categories:
         category_dict = {}
         page_books = get(url_category)
