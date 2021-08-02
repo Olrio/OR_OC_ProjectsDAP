@@ -16,9 +16,13 @@ Sont enregistrés dans ce répertoire :
 * le fichier csv avec les data de tous les livres de la catégorie
 * le fichier image de chaque livre de la catégorie
       
-### Création et activation d'un environnement virtuel
+### Création et activation d'un environnement virtuel (procédure sous linux)
 
-Dans le répertoire de travail, créer un environnement virtuel au moyen de la commande : `python -m venv env` 
+Se placer dans le répertoire de travail (existant ou à créer).  
+  
+Créer un clone du repository au moyen de la commande `git clone https://github.com/Olrio/OR_OC_ProjectsDAP`  
+
+Créer un environnement virtuel au moyen de la commande : `python -m venv env` 
 
 Activer cet environnement virtuel  avec : `source env/bin/activate`    
 
