@@ -116,6 +116,7 @@ def main():
         for url_book in url_books:
             page_book = get(url_book)
             category_dict[url_books.index(url_book)] = get_data_book(page_book, url_book, url_category)
+            print(url_book)
         create_csv(category_dict, url_category)
 
 
