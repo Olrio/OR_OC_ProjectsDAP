@@ -1,16 +1,17 @@
-# Project P2
-# This script uses the 'requests' and 'BeautifulSoup' libraries for a web_scraping process
-# From the website books.toscrape.com, the script extracts some data on a book.
-# Data collected are (UPC, title, price, description, file image, ...)
-# This is done for every books of a category and for every categories of the website
-# All collected data are registered in a csv file on a local directory on the user's machine
-# One subdirectory is created for each category
-# The files of the images of all the books in a category are stored in the dedicated subdirectory
+"""
+Project P2
+This script uses the 'requests' and 'BeautifulSoup' libraries for a web_scraping process
+From the website books.toscrape.com, the script extracts some data on a book.
+Data collected are (UPC, title, price, description, file image, ...)
+This is done for every books of a category and for every categories of the website
+All collected data are registered in a csv file on a local directory on the user's machine
+One subdirectory is created for each category
+The files of the images of all the books in a category are stored in the dedicated subdirectory
+"""
 
 import csv
 import os
 import re
-# importation of necessary libraries for ETL
 import urllib.request
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
@@ -18,14 +19,14 @@ from requests import get
 
 
 def get_url_categories(page):
-    # get the URL's of all categories of books and store them in a list
+    """Get the URL's of all categories of books and store them in a list"""
     soup_categories = BeautifulSoup(page.content, 'html.parser')
     url_raw_categories = [i["href"] for i in soup_categories.find("ul", class_="nav").find_next("ul").find_all("a")]
     return url_raw_categories
 
 
 def get_url_books(page, url, books):
-    # get the URL's of all books in the category and store them in a list
+    """Get the URL's of all books in the category and store them in a list"""
     soup_books = BeautifulSoup(page.content, 'html.parser')
     books.extend([i.find("a")["href"] for i in soup_books.find_all("article")])
     if soup_books.find("li", class_="next"):
@@ -37,8 +38,9 @@ def get_url_books(page, url, books):
         pass
     return books
 
+
 def get_data_book(page, url):
-    # get all the required data on a book and store them in a dictionary
+    """Get all the required data on a book and store them in a dictionary"""
     soup_book = BeautifulSoup(page.content, 'html.parser')
     book_dict = dict()
     book_dict["product_page_url"] = url
@@ -60,15 +62,15 @@ def get_data_book(page, url):
 
 
 def get_file_image(name, url_image, url, url_category):
-    # get the image_file of the book on the web
-    # save this in a local directory with an evocative name
+    """Get the image_file of the book on the web
+    save this in a local directory with an evocative name"""
     file_image = urllib.request.urlretrieve(urljoin(url, url_image),
                                             f'./Web_scraper/{url_category.split("/")[-2]}/{name}.jpg')
     return file_image
 
 
 def transfo_url(url, url_raws):
-    # transformation of  relative url in absolute url
+    """Transformation of  relative url in absolute url """
     if type(url_raws) == list:
         return [urljoin(url, url_raw) for url_raw in url_raws]
     elif type(url_raws) == str:
@@ -76,26 +78,26 @@ def transfo_url(url, url_raws):
 
 
 def transfo_data_book(raw_data_book, url, url_category):
-    # modification of the file_image name with no special characters
-    # matching literal and numeric numbers for review_rating
-    # add quotes to the path of the file_image in csv for further use in terminal
-        raw_data_book["image_url"] = transfo_url(url, raw_data_book["image_url"])
-        name_image = re.sub('[<>/:"|?*,\\\\]', "_", raw_data_book["title"])
-        file_image = get_file_image(name_image, raw_data_book["file_image"], url, url_category)
-        raw_data_book["file_image"] = '"' + os.path.join(os.getcwd(), file_image[0]) + '"'
-        number_dict = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
-        raw_data_book["review_rating"] = number_dict[raw_data_book["review_rating"]]
-        return raw_data_book
+    """Modification of the file_image name with no special characters
+    matching literal and numeric numbers for review_rating
+    add quotes to the path of the file_image in csv for further use in terminal"""
+    raw_data_book["image_url"] = transfo_url(url, raw_data_book["image_url"])
+    name_image = re.sub('[<>/:"|?*,\\\\]', "_", raw_data_book["title"])
+    file_image = get_file_image(name_image, raw_data_book["file_image"], url, url_category)
+    raw_data_book["file_image"] = '"' + os.path.join(os.getcwd(), file_image[0]) + '"'
+    number_dict = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
+    raw_data_book["review_rating"] = number_dict[raw_data_book["review_rating"]]
+    return raw_data_book
 
 
 def create_directory(name):
-    # create a directory where all files related to a category are stored
+    """Create a directory where all files related to a category are stored"""
     os.makedirs("./Web_scraper/" + name.split("/")[-2], exist_ok=True)
 
 
 def create_csv(dictionary, name):
-    # write in a new csv_file
-    # all variables under are headers in the created file
+    """Write in a new csv_file
+    all variables under are headers in the created file"""
     nom_cat = name.split("/")[-2]
 
     list_headers = ["product_page_url",
@@ -119,7 +121,7 @@ def create_csv(dictionary, name):
 
 
 def main():
-    # main function of the program
+    """Main function of the program"""
     URL_HOME = "http://books.toscrape.com"
     page_categories = get(URL_HOME)
     url_raw_categories = get_url_categories(page_categories)
@@ -136,10 +138,10 @@ def main():
             category_raw_dict[url_books.index(url_book)] = get_data_book(page_book, url_book)
             category_dict[url_books.index(url_book)] = transfo_data_book(category_raw_dict[url_books.index(url_book)],
                                                                          url_book, url_category)
-            print(url_book)
+            print(url_book)  # following the execution of the script
         create_csv(category_dict, url_category)
 
 
 if __name__ == "__main__":
-    # entry of the program
+    """Entry of the program"""
     main()
