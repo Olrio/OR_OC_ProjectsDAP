@@ -68,6 +68,7 @@ def get_file_image(name, url_image, url, url_category):
 
 
 def transfo_url(url, url_raws):
+    # transformation of  relative url in absolute url
     if type(url_raws) == list:
         return [urljoin(url, url_raw) for url_raw in url_raws]
     elif type(url_raws) == str:
@@ -75,6 +76,9 @@ def transfo_url(url, url_raws):
 
 
 def transfo_data_book(raw_data_book, url, url_category):
+    # modification of the file_image name with no special characters
+    # matching literal and numeric numbers for review_rating
+    # add quotes to the path of the file_image in csv for further use in terminal
         raw_data_book["image_url"] = transfo_url(url, raw_data_book["image_url"])
         name_image = re.sub('[<>/:"|?*,\\\\]', "_", raw_data_book["title"])
         file_image = get_file_image(name_image, raw_data_book["file_image"], url, url_category)
