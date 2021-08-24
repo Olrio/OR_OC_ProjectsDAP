@@ -21,14 +21,18 @@ from requests import get
 def get_url_categories(page):
     """Get the URL's of all categories of books and store them in a list"""
     soup_categories = BeautifulSoup(page.content, 'html.parser')
-    url_raw_categories = [i["href"] for i in soup_categories.find("ul", class_="nav").find_next("ul").find_all("a")]
-    return url_raw_categories
+    try:
+        url_raw_categories = [i["href"] for i in soup_categories.find("ul", class_="nav").find_next("ul").find_all("a")]
+        return url_raw_categories
+    except AttributeError:
+        return []
 
 
 def get_url_books(page, url, books):
     """Get the URL's of all books in the category and store them in a list"""
     soup_books = BeautifulSoup(page.content, 'html.parser')
     books.extend([i.find("a")["href"] for i in soup_books.find_all("article")])
+    print(url)   # following the categories pages
     if soup_books.find("li", class_="next"):
         next_url_raw = soup_books.find("li", class_="next").find_next("a")["href"]
         next_url = transfo_url(url, next_url_raw)
@@ -120,12 +124,41 @@ def create_csv(dictionary, name):
             writer.writerow(book.values())
 
 
+def get_url_scrap():
+    """Interaction with the user who enter the url of the web page to scrap"""
+    url_scrap = input("Enter the url of the page(s) you want to scrap : a category page,"
+                      "a book page or the home site : ")
+    if "https://books.toscrape.com" not in url_scrap:
+        print("Please choose a web page on books.toscrape.com")
+    if get(url_scrap).status_code != 200:
+        print("There seems to be a connexion problem with the page you chose")
+        print("Please verify your internet connection")
+        exit()
+    return url_scrap
+
+
 def main():
     """Main function of the program"""
-    URL_HOME = "http://books.toscrape.com"
-    page_categories = get(URL_HOME)
-    url_raw_categories = get_url_categories(page_categories)
-    url_categories = transfo_url(URL_HOME, url_raw_categories)
+    url_scrap = get_url_scrap()
+    if url_scrap == "https://books.toscrape.com" \
+            or url_scrap == "https://books.toscrape.com/index.html"\
+            or "/category/books_1" in url_scrap:  # scraping the whole site
+        url_scrap = "https://books.toscrape.com"
+        page_categories = get(url_scrap)
+        url_raw_categories = get_url_categories(page_categories)
+        url_categories = transfo_url(url_scrap, url_raw_categories)
+    elif "category/books/" not in url_scrap:  # scraping only one book on the site
+        page_book = get(url_scrap)
+        create_directory(url_scrap)
+        data_raw_book = get_data_book(page_book, url_scrap)
+        data_book = dict()
+        data_book["book"] = transfo_data_book(data_raw_book, url_scrap, url_scrap)
+        create_csv(data_book, url_scrap)
+        exit()
+    else:  # scraping only one category
+        url_categories = list()
+        url_categories.append(url_scrap)  # there's only one category in url_categories
+
     for url_category in url_categories:
         category_raw_dict = dict()
         category_dict = dict()
