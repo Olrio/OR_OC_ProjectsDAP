@@ -174,7 +174,30 @@ def main():
             print(url_book)  # following the execution of the script
         create_csv(category_dict, url_category)
 
+def main2():
+    """main for poo version"""
+    class Book:
+        def __init__(self, url):
+            self.url = url
+
+        def web_page(self):
+            return get(self.url).content
+
+        def display_page(self):
+            print(self.web_page())
+
+        def title(self):
+            self.soup_book = BeautifulSoup(self.web_page(), 'html.parser')
+            self.title = self.soup_book.find("title").text.split("|")[0].strip()
+            return self.title
+
+    book1 = Book("https://books.toscrape.com/catalogue/tsubasa-world-chronicle-2-tsubasa-world-chronicle-2_949/index.html")
+    book1.display_page()
+    print(book1.title())
+
+
+
 
 if __name__ == "__main__":
     """Entry of the program"""
-    main()
+    main2()
