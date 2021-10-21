@@ -191,9 +191,16 @@ def main2():
             self.title = self.soup_book.find("title").text.split("|")[0].strip()
             return self.title
 
+        def upc(self):
+            self.upc = self.soup_book.find("th", text="UPC").find_next("td").text
+            return self.upc
+
+
     book1 = Book("https://books.toscrape.com/catalogue/tsubasa-world-chronicle-2-tsubasa-world-chronicle-2_949/index.html")
     book1.display_page()
     print(book1.title())
+    print(book1.url)
+    print(book1.upc())
 
 
 
