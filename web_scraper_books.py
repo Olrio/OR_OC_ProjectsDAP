@@ -179,28 +179,54 @@ def main2():
     class Book:
         def __init__(self, url):
             self.url = url
+            self.soup_book = BeautifulSoup(self.web_page(), 'html.parser')
 
         def web_page(self):
             return get(self.url).content
 
-        def display_page(self):
-            print(self.web_page())
-
         def title(self):
-            self.soup_book = BeautifulSoup(self.web_page(), 'html.parser')
-            self.title = self.soup_book.find("title").text.split("|")[0].strip()
-            return self.title
+            return self.soup_book.find("title").text.split("|")[0].strip()
 
         def upc(self):
-            self.upc = self.soup_book.find("th", text="UPC").find_next("td").text
-            return self.upc
+            return self.soup_book.find("th", text="UPC").find_next("td").text
+
+        def price_including_tax(self):
+            return self.soup_book.find("th", text="Price (incl. tax)").find_next("td").text
+
+        def price_excluding_tax(self):
+            return self.soup_book.find("th", text="Price (excl. tax)").find_next("td").text
+
+        def number_available(self):
+            return self.soup_book.find("th", text="Availability").find_next("td").text
+
+        def product_description(self):
+            return self.soup_book.find(id="product_description").find_next("p").text
+
+        def category(self):
+            return self.soup_book.find("a", text="Books").find_next("a").text
+
+        def review_rating(self):
+            number_dict = {"One": 1, "Two": 2, "Three": 3, "Four": 4, "Five": 5}
+            return number_dict[self.soup_book.find("p",
+                                                   {'class': lambda x: "star-rating" in x.split()})["class"].pop()]
+
+        def image_url(self):
+            return urljoin(self.url, self.soup_book.find("img")["src"])
+
+
 
 
     book1 = Book("https://books.toscrape.com/catalogue/tsubasa-world-chronicle-2-tsubasa-world-chronicle-2_949/index.html")
-    book1.display_page()
     print(book1.title())
     print(book1.url)
     print(book1.upc())
+    print(book1.price_including_tax())
+    print(book1.price_excluding_tax())
+    print(book1.number_available())
+    print(book1.product_description())
+    print(book1.category())
+    print(book1.review_rating())
+    print(book1.image_url())
 
 
 
