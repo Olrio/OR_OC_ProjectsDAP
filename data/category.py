@@ -1,8 +1,8 @@
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from requests import get
-from Data.book import Book
-from Data.result import FileCsv
+from data.book import Book
+from data.result import FileCsv
 
 
 class Category:

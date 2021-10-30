@@ -1,5 +1,5 @@
-from Data.bs import DataBook
-from Data.transfo import TransformDataBook
+from data.bs import DataBook
+from data.transfo import TransformDataBook
 
 
 class Book:

@@ -1,7 +1,7 @@
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from requests import get
-from Data.category import Category
+from data.category import Category
 
 
 class Site:

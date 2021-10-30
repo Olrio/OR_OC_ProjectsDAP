@@ -1,9 +1,9 @@
-from Data.choice import InputUrl
-from Errors_management.error import ResponseError
-from Data.book import Book
-from Data.result import FileCsv
-from Data.category import Category
-from Data.site import Site
+from data.choice import InputUrl
+from errors.error import ResponseError
+from data.book import Book
+from data.result import FileCsv
+from data.category import Category
+from data.site import Site
 
 
 def main():
