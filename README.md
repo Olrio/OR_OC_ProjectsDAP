@@ -30,4 +30,4 @@ Activer cet environnement virtuel  avec : `source env/bin/activate`
 
 Y installer les modules nécessaires à partir du fichier *requirements.txt* : `pip install -r requirements.txt` 
 
-Lancer l'exécution du programme *web_scraper_books.py* au moyen de la commande : `python web_scraper_books.py`  
+Lancer l'exécution du programme *bookscraper.py* au moyen de la commande : `python bookscraper.py`  
