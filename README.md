@@ -2,7 +2,7 @@
 
 ### Présentation du script
 
-Le programme bookscraper.py utilise la technique de Web scraping pour le site [books.toscrape.com](http://books.toscrape.com).  
+Le programme bookscraper.py utilise la technique de Web scraping pour le site [https://books.toscrape.com](http://books.toscrape.com).  
 
 Le script parcourt toutes les catégories de livres du site.  
 
@@ -16,7 +16,9 @@ Sont enregistrés dans ce répertoire :
 * le fichier csv avec les data de tous les livres de la catégorie
 * le fichier image de chaque livre de la catégorie
 
-Le script propose initialement à l'utilisateur de choisir si il souhaite extraire des données pour un seul livre, une catégorie de livres, ou pour tous les livres du site.
+Le script propose initialement à l'utilisateur de saisir l'URL de la page web dont il souhaite extraire les données.
+
+Cette URL peut correspondre à un seul livre, à une catégorie de livres, ou à l'ensemble des livres du site.
       
 ### Création et activation d'un environnement virtuel (procédure sous linux)
 

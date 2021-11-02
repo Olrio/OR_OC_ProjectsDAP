@@ -1,1 +1,1 @@
-__all__ = ["site", "category"]
+__all__ = ["site", "category", "book"]

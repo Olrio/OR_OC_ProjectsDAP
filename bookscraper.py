@@ -14,9 +14,11 @@ def main():
 
     if url_scrap == "https://books.toscrape.com" \
             or url_scrap == "https://books.toscrape.com/index.html"\
-            or "/category/books_1" in url_scrap:  # scraping the whole site
+            or "/category/books_1" in url_scrap:
+        # scraping the whole site
         Site("https://books.toscrape.com")
-    elif "category/books/" not in url_scrap:  # scraping only one book on the site
+    elif "category/books/" not in url_scrap:
+        # scraping only one book on the site
         book = Book(url_scrap)
         FileCsv([book], book.category_dir)
     else:
