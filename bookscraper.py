@@ -23,6 +23,7 @@ def main():
         FileCsv([book], book.category_dir)
     else:
         Category(url_scrap)
+        # scraping a category
 
 
 if __name__ == "__main__":

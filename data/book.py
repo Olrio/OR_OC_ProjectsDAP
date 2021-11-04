@@ -7,6 +7,7 @@ class Book:
 
     def __init__(self, url):
         """Initiate a book defined by its url"""
+        self.book = None
         self.product_page_url = url
         self.title = None
         self.upc = None
@@ -23,16 +24,17 @@ class Book:
 
     def get_attributes(self):
         """Define other attributes calling BeautifulSoup"""
-        self.title = DataBook(self.product_page_url).get_book_title()
-        self.upc = DataBook(self.product_page_url).get_book_upc()
-        self.price_including_tax = DataBook(self.product_page_url).get_book_price_including_tax()
-        self.price_excluding_tax = DataBook(self.product_page_url).get_book_price_excluding_tax()
-        self.number_available = DataBook(self.product_page_url).get_number_available()
-        self.product_description = DataBook(self.product_page_url).get_product_description()
-        self.category = DataBook(self.product_page_url).get_category()
-        self.category_dir = DataBook(self.product_page_url).get_category_dir()
-        self.review_rating = DataBook(self.product_page_url).get_review_rating()
-        self.image_url = DataBook(self.product_page_url).get_image_url()
+        self.book = DataBook(self.product_page_url)
+        self.title = self.book.get_book_title()
+        self.upc = self.book.get_book_upc()
+        self.price_including_tax = self.book.get_book_price_including_tax()
+        self.price_excluding_tax = self.book.get_book_price_excluding_tax()
+        self.number_available = self.book.get_number_available()
+        self.product_description = self.book.get_product_description()
+        self.category = self.book.get_category()
+        self.category_dir = self.book.get_category_dir()
+        self.review_rating = self.book.get_review_rating()
+        self.image_url = self.book.get_image_url()
         self.file_image = TransformDataBook(self.product_page_url).transform_file_image_name(
             self.title, self.image_url, self.category_dir)
         print(self.title)  # enables to follow the execution of the script
