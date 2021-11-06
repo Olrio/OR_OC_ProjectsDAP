@@ -1,0 +1,66 @@
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+Young Adult/
+Womens Fiction/
+Travel/
+Thriller/
+Academic/
+Add a comment/
+Adult Fiction/
+Art/
+Autobiography/
+Biography/
+Business/
+Childrens/
+Christian Fiction/
+Christian/
+Classics/
+Contemporary/
+Crime/
+Cultural/
+Default/
+Erotica/
+Fantasy/
+Fiction/
+Food and Drink/
+Health/
+Historical Fiction/
+Historical/
+History/
+Horror/
+Humor/
+Music/
+Mystery/
+New Adult/
+Nonfiction/
+Novels/
+P1_RIO_Olivier/
+P2_RIO_Olivier/
+P2books.csv
+Paranormal/
+Parenting/
+Philosophy/
+Poetry/
+Politics/
+ProtoP2_v3.py
+Psychology/
+Religion/
+Romance/
+Science Fiction/
+Science/
+Self Help/
+Sequential Art/
+Short Stories/
+Spirituality/
+Sports and Games/
+Suspense/
+Webscrapper/
+Web_scraper/
+env/
+Web_scraper.zip
+.idea/
+data/__pycache__/
