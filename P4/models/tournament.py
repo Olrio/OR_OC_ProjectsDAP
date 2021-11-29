@@ -1,27 +1,96 @@
 """
-Gestion d'un tournoi
+Management of a tournament
 """
 
 import random
 from models.match import Match
+from models.data import Data
 
 
 class Tournament:
-    def __init__(self, name, location):
-        """initialise un nouveau tournoi"""
+    def __init__(
+        self,
+        name,
+        town,
+        country,
+        date_start="N/A",
+        date_end="N/A",
+        status="N/A",
+        control_time="N/A",
+        description="N/A",
+    ):
+        """initialization of a new tournament"""
         self.name = name
-        self.location = location  # lieu du tournoi
-        self.date = None  # date du tournoi. 1 jour habituellement mais potentiellement plusieurs
-        self.nb_rounds = 4  # nombre de rondes du tournoi
-        self.rounds = []  # liste des instances rondes
-        self.players = []  # liste des instances joueur
-        self.control_time = []  # bullet, blitz ou coup rapide
-        self.description = ""  # remarques du directeur du tournoi
+        self.town = town  # town location of the tournament
+        self.country = country  # country location of the tournament
+        self.id = self.get_id()  # unique identifiant of the tournament
+        self.date_start = date_start  # starting date of the tournament.
+        self.date_end = date_end  # ending date of the tournament (duration usually equals to one day)
+        self.status = status  # ended / in progress / upcoming
+        self.nb_rounds = 4  # number of rounds in the tournament
+        self.control_time = control_time  # bullet, blitz or rapid
+        self.description = description  # tournament director's comments
+        # the following attributes shouldn't be modified by editing the tournament
+        # modifications are enable by specific interactions or by the script itself
+        self.rounds = []  # list of round instances
+        self.players = []  # list of player instances
         self.first_half = []
         self.second_half = []
+        self.dict_attributes = {
+            "1": "name",
+            "2": "town",
+            "3": "country",
+            "4": "id",
+            "5": "date_start",
+            "6": "date_end",
+            "7": "status",
+            "8": "nb_rounds",
+            "9": "control_time",
+            "10": "description",
+        }
+        self.label_attributes = {
+            "name": "Nom du tournoi",
+            "town": "Ville",
+            "country": "Pays",
+            "id": "ID",
+            "date_start": "Date de début",
+            "date_end": "Date de fin",
+            "status": "Statut",
+            "nb_rounds": "Nombre de rounds",
+            "control_time": "Type de partie",
+            "description": "Commentaires",
+        }
+        self.number_attributes = {
+            "Nom du tournoi": "1",
+            "Ville": "2",
+            "Pays": "3",
+            "ID": "4",
+            "Date de début": "5",
+            "Date de fin": "6",
+            "Statut": "7",
+            "Nombre de rounds": "8",
+            "Type de partie": "9",
+            "Commentaires": "10",
+        }
+
+    def get_id(self):
+        """
+        consulting the list of saved tournaments
+        create a list of id of all saved tournaments
+        """
+        self.list_id = Data().list_of_saved_tournaments_id()
+        self.random_id = random.randint(1, 1000)
+        while str(self.random_id) in self.list_id:
+            self.random_id = random.randint(1, 1000)
+        print(self.list_id)
+        print(self.random_id)
+        return str(self.random_id)
+
+    def set_new_value(self, param, value):
+        self.__setattr__(param, value)
 
     def __str__(self):
-        return str([f"{player[0]} {player[1]}" for player in self.players])
+        return str(f"{self.name}")
 
     def add_date(self, date):
         self.date = date
@@ -31,17 +100,19 @@ class Tournament:
             self.players.append(player)
 
     def sort_players(self):
-        self.players.sort(key=lambda x: x.rank)  # tri des joueurs par classement
-        self.players.sort(key=lambda x: x.score, reverse=True)  # tri des joueurs par score
+        self.players.sort(key=lambda x: x.rank)  # players sorted by rank
+        self.players.sort(
+            key=lambda x: x.score, reverse=True
+        )  # players sorted by score
         return self.players
 
     def first_round_sort_players(self):
-        # répartition des joueurs en deux moitiés : les x premiers et les x derniers
+        # players are divided in two equal groups : the x best players and the x latest players
         self.first_half = self.players.copy()
         while len(self.first_half) > len(self.second_half):
             self.second_half.append(self.first_half.pop())
 
-        # tri des joueurs de la seconde moitié par classement
+        # players of the latest group are sorted by rank
         self.second_half.sort(key=lambda x: x.rank)
 
     def first_matchs(self):
@@ -105,8 +176,12 @@ class Tournament:
                 match = Match(first_players[0], second_players[x])
                 for myround in self.rounds:
                     for past_match in myround.matchs:
-                        if match.player1 == past_match.player1 and match.player2 == past_match.player2 \
-                                or match.player1 == past_match.player2 and match.player2 == past_match.player1:
+                        if (
+                            match.player1 == past_match.player1
+                            and match.player2 == past_match.player2
+                            or match.player1 == past_match.player2
+                            and match.player2 == past_match.player1
+                        ):
                             if len(first_players) > 2:
                                 x += 1
                                 flag = 1

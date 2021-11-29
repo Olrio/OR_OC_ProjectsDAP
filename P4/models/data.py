@@ -7,33 +7,48 @@ import pickle
 
 class Data:
     """database"""
+
     def __init__(self):
         self.players = []
-        self.tournaments = []
+        self.tournaments = {}
 
     def add_tournament(self, tournament):
-        """ add a new tournament to the list of tournaments"""
-        if tournament not in self.tournaments:
-            self.tournaments.append(tournament)
+        """add a new tournament to the list of tournaments"""
+        if tournament not in self.tournaments.values():
+            self.tournaments[tournament.id] = tournament
 
-    def save_tournaments(self):
-        """ save the list of tournaments in a file"""
-        with open("models/tournaments", "wb") as file_tournaments:
-            pickle.dump(self.tournaments, file_tournaments)
+    def save_tournaments(self, tournaments):
+        """save the list of tournaments in a file"""
+        with open("data/tournaments2", "rb") as file_tournaments:
+            self.already_saved_files = pickle.load(file_tournaments)
+        self.already_saved_files.update(self.tournaments)
+        with open("data/tournaments2", "wb") as file_tournaments:
+            pickle.dump(self.already_saved_files, file_tournaments)
 
     def load_tournaments(self):
-        """ load the list of tournaments from a file"""
-        self.tournaments = []
-        with open("models/tournaments", "rb") as file_tournaments:
-            self.tournaments = pickle.load(file_tournaments)
+        """load the list of tournaments from a file"""
+        with open("data/tournaments2", "rb") as file_tournaments:
+            self.loaded_tournaments = pickle.load(file_tournaments)
+        """ test if pickle data are stored as a list or as a dict"""
+        for tournament in self.loaded_tournaments.values():
+            self.tournaments[tournament.id] = tournament
+        return self.tournaments
+
+    def list_of_saved_tournaments_id(self):
+        self.id_list = []
+        with open("data/tournaments", "rb") as file_tournaments:
+            self.saved_tournaments = pickle.load(file_tournaments)
+        for tournament in self.saved_tournaments.values():
+            self.id_list.append(tournament.id)
+        return self.id_list
 
     def add_players(self, player):
-        """ add a new player to the whole list of players """
+        """add a new player to the whole list of players"""
         if player not in self.players:
             self.players.append(player)
 
     def get_players(self):
-        """ get the whole list of players """
+        """get the whole list of players"""
         return self.players
 
     def save_players(self):

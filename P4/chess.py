@@ -11,7 +11,13 @@ S'exécute dans un environnement virtuel
 5- Répéter les étapes 3 et 4 jusqu'à ce que tous les tours soient joués
 """
 
-from controller import Controller
+from controller.controller import Controller
 
-mycontroller = Controller()
-mycontroller.run()
+
+def main():
+    mycontroller = Controller()
+    mycontroller.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -2,6 +2,7 @@
 Gestion de la classe Joueur
 """
 
+
 class Player:
     def __init__(self, data_player):
         """initialise un nouveau joueur"""
@@ -17,4 +18,4 @@ class Player:
         self.rank = rank
 
     def __str__(self):
-        return (f"{self.lastname}, {self.firstname} ({self.rank})")
+        return f"{self.lastname}, {self.firstname} ({self.rank})"
