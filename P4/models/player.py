@@ -2,16 +2,30 @@
 Gestion de la classe Joueur
 """
 
+from models.data import Data
 
 class Player:
-    def __init__(self, data_player):
+    def __init__(self, lastname, firstname, rank = 0, lang="fr"):
         """initialise un nouveau joueur"""
-        self.lastname = data_player[0]  # nom de famille
-        self.firstname = data_player[1]
-        self.birthdate = None
-        self.gender = None
-        self.rank = data_player[2]
-        self.score = 0
+        self.lastname = lastname  # nom de famille
+        self.firstname = firstname
+        self.birthdate = ""
+        self.gender = ""
+        self.rank = rank
+        self.id = self.get_id()
+        self.translation = self.get_translation(lang)
+
+    def get_id(self):
+        list_id = Data().list_of_saved_players_id()
+        return str(len(list_id))
+
+    def get_translation(self, lang):
+        if lang == "fr":
+            return {"lastname":"Nom", "firstname":"Prénom", "birthdate":"Date de naissance",
+                              "gender":"Sexe", "rank":"Classement"}
+
+    def set_new_value(self, param, value):
+        self.__setattr__(param, value)
 
     def modify_rank(self, rank):
         """possibilité de modifier manuellement le rang d'un joueur"""

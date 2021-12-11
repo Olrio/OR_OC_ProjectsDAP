@@ -12,9 +12,18 @@ S'exécute dans un environnement virtuel
 """
 
 from controller.controller import Controller
-
+from models.data import Data
+from models.tournament import Tournament
+from models.player import Player
+import pickle
 
 def main():
+    # mydb = Data()
+    # tournaments = mydb.load_tournaments()
+    # tournaments['3'].rounds = []
+    # mydb.save_tournaments(tournaments)
+    # exit()
+
     mycontroller = Controller()
     mycontroller.run()
 
