@@ -20,7 +20,7 @@ class View:
         return result
 
     def menu_headers(self, menu, historic, tournament, player):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -110,7 +110,7 @@ class View:
         print(f"{match.player1} + 0 point")
 
     def swiss_sort_players(self, menu, historic, tournament):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -129,7 +129,7 @@ class View:
         return input("--> ")
 
     def swiss_final_results(self, menu, historic, tournament):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -146,7 +146,7 @@ class View:
 
 
     def swiss_round_matchs(self, menu, historic, tournament):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -163,7 +163,7 @@ class View:
         return input("--> ")
 
     def enter_match_result(self, menu, historic, tournament, match):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -191,7 +191,7 @@ class Report:
         return result
 
     def display_selected_player(self, menu, historic, tournament, player):
-        os.system("clear")
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -204,7 +204,7 @@ class Report:
             print("{:<2}".format(f"[{item[0]}]"))
 
     def display_selected_tournament(self, menu, historic, tournament, player):
-        os.system("clear")
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -222,7 +222,7 @@ class Report:
             print(f"{t_player.lastname:>25} {t_player.firstname:>15}{'(':>15}{t_player.rank}){score:>10}")
 
     def display_players_by_name(self, menu, historic, players, tournament, player):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -235,7 +235,7 @@ class Report:
             print(f"{player.lastname:<10} {player.firstname:<15} {player.rank:<15} [{player.id}]")
 
     def display_players_by_rank(self, menu, historic, tournament, players, player):
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -284,7 +284,7 @@ class Report:
     def display_tournaments_global(self, menu, historic, tournaments, tournament, player):
         # display headers from the first tournament of the list
         # names of columns are issued from dict(label_attributes)
-        os.system("clear")
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
@@ -335,7 +335,7 @@ class EditTournament:
         return input("-->  ")
 
     def new_value_for_data(self, menu, historic, tournament, player, param, olddata):
-        os.system("clear")
+        os.system('cls' if os.name == 'nt' else 'clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
         print(f"{path_menu}")
