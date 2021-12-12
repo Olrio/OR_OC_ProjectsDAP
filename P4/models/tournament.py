@@ -3,7 +3,6 @@ Management of a tournament
 """
 
 import random
-from models.match import Match
 from models.data import Data
 
 
@@ -19,7 +18,7 @@ class Tournament:
         control_time="N/A",
         description="N/A",
         system="swiss",
-            lang="fr"
+        lang="fr",
     ):
         """initialization of a new tournament"""
         self.name = name
@@ -28,22 +27,27 @@ class Tournament:
         self.id = self.get_id()  # unique identifiant of the tournament
         self.date_start = date_start  # starting date of the tournament.
         self.date_end = date_end  # ending date of the tournament (duration usually equals to one day)
-        self.status = status  # 'upcoming' is default, options are 'in progress' and 'ended'
+        self.status = (
+            status  # 'upcoming' is default, options are 'in progress' and 'ended'
+        )
         self.nb_rounds = 4  # number of rounds in the tournament
         self.control_time = control_time  # bullet, blitz or rapid
         self.description = description  # tournament director's comments
-        self.system = system # "swiss" by default
+        self.system = system  # "swiss" by default
         self.translation = self.get_translation(lang)
         # the following attributes shouldn't be modified by editing the tournament
-        # modifications are enable by specific interactions or by the script itself
+        # modifications are enabled by specific interactions or by the script itself
         self.rounds = []  # list of round instances
         self.players = []  # list of player instances
-        self.singleton = []  # manage single player when number of tournament players is odd
+        self.singleton = (
+            []
+        )  # manage single player when number of tournament players is odd
         self.scores = {}
         self.first_half = []
         self.second_half = []
 
-    def get_id(self):
+    @staticmethod
+    def get_id():
         """
         consulting the list of saved tournaments
         create a list of id of all saved tournaments
@@ -51,22 +55,23 @@ class Tournament:
         list_id = Data().list_of_saved_tournaments_id()
         return str(len(list_id))
 
-    def get_translation(self, lang):
+    @staticmethod
+    def get_translation(lang):
         if lang == "fr":
             return {
-            "name": "Nom du tournoi",
-            "town": "Ville",
-            "country": "Pays",
-            "id": "ID",
-            "date_start": "Date de début",
-            "date_end": "Date de fin",
-            "status": "Statut",
-            "nb_rounds": "Nombre de rounds",
-            "control_time": "Type de partie",
-            "description": "Commentaires",
-            "system" : "Système",
-                "scores": "Scores"
-        }
+                "name": "Nom du tournoi",
+                "town": "Ville",
+                "country": "Pays",
+                "id": "ID",
+                "date_start": "Date de début",
+                "date_end": "Date de fin",
+                "status": "Statut",
+                "nb_rounds": "Nombre de rounds",
+                "control_time": "Type de partie",
+                "description": "Commentaires",
+                "system": "Système",
+                "scores": "Scores",
+            }
 
     def set_new_value(self, param, value):
         self.__setattr__(param, value)
@@ -80,7 +85,7 @@ class Tournament:
 
     def remove_player(self, player):
         self.players.remove(player)
-        del(self.scores[player])
+        del self.scores[player]
 
     def sort_players(self):
         self.players.sort(key=lambda x: x.rank)  # players sorted by rank
@@ -90,8 +95,8 @@ class Tournament:
         return self.players
 
     def generate_round(self, newround):
-        for round in self.rounds:
-            if newround.name == round.name:
+        for t_round in self.rounds:
+            if newround.name == t_round.name:
                 return
         self.rounds.append(newround)
 

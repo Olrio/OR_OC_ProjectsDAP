@@ -7,7 +7,6 @@ Display statistics
 
 import os
 import time
-import operator
 
 
 class View:
@@ -31,7 +30,7 @@ class View:
 
     def choose_submenu(self, menu, historic, tournament, player):
         self.menu_headers(menu, historic, tournament, player)
-        print("Voulez-vous : ")
+        print("Faites un choix : ")
         for option in menu.submenus.items():
             print(f"{option[1].name:<30} [{option[0]}]")
         return input("-->  ")

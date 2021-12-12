@@ -4,13 +4,9 @@ Manage the menus of the script
 
 
 class Menu:
-    def __init__(self, name, id):
+    def __init__(self, name, m_id):
         self.name = name
-        self.id = id
+        self.id = m_id
         self.submenus = {}
         self.path = []
         self.choices = None
-
-
-
-

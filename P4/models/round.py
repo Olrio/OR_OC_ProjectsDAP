@@ -16,19 +16,21 @@ class Round:
         self.fin = None
         self.get_start_time()
 
-    def get_start_time(self):
+    @staticmethod
+    def get_start_time():
         """Enregistre le début de la partie"""
-        self.jour_debut = datetime.date.today().strftime("%Y/%m/%d")
-        self.heure_debut = datetime.datetime.now().strftime("%H:%M")
-        self.debut = (self.jour_debut, self.heure_debut)
-        return self.debut
+        jour_debut = datetime.date.today().strftime("%Y/%m/%d")
+        heure_debut = datetime.datetime.now().strftime("%H:%M")
+        debut = (jour_debut, heure_debut)
+        return debut
 
-    def get_end_time(self):
+    @staticmethod
+    def get_end_time():
         """Enregistre la fin de la partie"""
-        self.jour_fin = datetime.date.today().strftime("%Y/%m/%d")
-        self.heure_fin = datetime.datetime.now().strftime("%H:%M")
-        self.fin = (self.jour_fin, self.heure_fin)
-        return self.fin
+        jour_fin = datetime.date.today().strftime("%Y/%m/%d")
+        heure_fin = datetime.datetime.now().strftime("%H:%M")
+        fin = (jour_fin, heure_fin)
+        return fin
 
     def __str__(self):
         round_str = str(
