@@ -38,6 +38,7 @@ class Tournament:
         # modifications are enable by specific interactions or by the script itself
         self.rounds = []  # list of round instances
         self.players = []  # list of player instances
+        self.singleton = []  # manage single player when number of tournament players is odd
         self.scores = {}
         self.first_half = []
         self.second_half = []
@@ -120,43 +121,3 @@ class Tournament:
                 match.score2 += 0.5
                 match.player1.score += 0.5
                 match.player2.score += 0.5
-
-    def display_scores(self):
-        for player in self.players:
-            print(player, player.score)
-        print("________\n")
-
-    def other_matchs(self):
-        matchs = []
-        first_players = list(self.players)
-        second_players = list(self.players)
-
-        while first_players:
-            second_players.remove(second_players[0])
-            x = 0
-            appairing = 0
-            match = None
-
-            while appairing == 0:
-                flag = 0
-                match = Match(first_players[0], second_players[x])
-                for myround in self.rounds:
-                    for past_match in myround.matchs:
-                        if (
-                            match.player1 == past_match.player1
-                            and match.player2 == past_match.player2
-                            or match.player1 == past_match.player2
-                            and match.player2 == past_match.player1
-                        ):
-                            if len(first_players) > 2:
-                                x += 1
-                                flag = 1
-                                break
-                if flag == 0:
-                    appairing = 1
-
-            matchs.append(match)
-            first_players.remove(first_players[0])
-            first_players.remove(second_players[x])
-            second_players.remove(second_players[x])
-        return matchs

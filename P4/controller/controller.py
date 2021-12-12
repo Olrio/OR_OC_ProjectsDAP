@@ -12,8 +12,6 @@ from models.player import Player
 from models.tournament import Tournament
 from models.match import Match
 from view.view import View, Report, EditTournament
-from view.createplayer import get_players
-from view.createtournament import get_info_tournament, choose_players
 from models.menu import Menu
 
 
@@ -31,167 +29,166 @@ class Controller:
         self.edit.save_ok()
 
     def load_program(self):
-        self.data_program = self.db.load_program()
-        self.historic = self.data_program[0]
-        self.historic.append("Load")
-        self.tournaments = self.data_program[1]
-        self.tournament = self.data_program[2]
-        self.player = self.data_program[3]
-        self.run_back(self.historic, self.tournaments, self.tournament, self.player)
+        data_program = self.db.load_program()
+        historic = data_program[0]
+        historic.append("Load")
+        tournaments = data_program[1]
+        tournament = data_program[2]
+        player = data_program[3]
+        self.run_back(historic, tournaments, tournament, player)
 
     def run_back(self, historic, tournaments, tournament, player):
-        self.historic = historic
-        pop = self.historic.pop()
+        pop = historic.pop()
         if pop == "Load":
-            self.menu = self.historic[-1]
+            menu = historic[-1]
         else:
-            self.menu = self.historic.pop()
-            self.historic.append(self.menu)
-        if self.menu.name == self.menu_home.name:
-            self.run_home(self.menu, self.historic, tournaments, tournament, player)
-        elif self.menu.name == self.menu_tournament.name:
+            menu = historic.pop()
+            historic.append(menu)
+        if menu.name == self.menu_home.name:
+            self.run_home(menu, historic, tournaments, tournament, player)
+        elif menu.name == self.menu_tournament.name:
             self.run_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_player.name:
-            self.run_player(self.menu, self.historic, tournaments, tournament, player)
-        elif self.menu.name == self.menu_load_a_tournament.name:
+        elif menu.name == self.menu_player.name:
+            self.run_player(menu, historic, tournaments, tournament, player)
+        elif menu.name == self.menu_load_a_tournament.name:
             self.run_load_a_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_edit_tournament.name:
+        elif menu.name == self.menu_edit_tournament.name:
             self.run_edit_a_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_players_in_tournament.name:
+        elif menu.name == self.menu_players_in_tournament.name:
             self.run_players_in_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_load_a_player.name:
+        elif menu.name == self.menu_load_a_player.name:
             self.run_load_a_player(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_edit_player.name:
+        elif menu.name == self.menu_edit_player.name:
             self.run_edit_a_player(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_management.name:
+        elif menu.name == self.menu_management.name:
             self.run_management(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_start_tournament.name:
+        elif menu.name == self.menu_start_tournament.name:
             self.run_start_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_resume_tournament.name:
+        elif menu.name == self.menu_resume_tournament.name:
             self.run_resume_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_create_a_player.name:
+        elif menu.name == self.menu_create_a_player.name:
             self.run_create_a_player(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_create_a_tournament.name:
+        elif menu.name == self.menu_create_a_tournament.name:
             self.run_create_a_tournament(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
             )
-        elif self.menu.name == self.menu_swiss.name:
-            self.run_swiss(self.menu, self.historic, tournaments, tournament, player)
-        elif self.menu.name == self.menu_swiss_first_round.name:
+        elif menu.name == self.menu_swiss.name:
+            self.run_swiss(menu, historic, tournaments, tournament, player)
+        elif menu.name == self.menu_swiss_first_round.name:
             self.run_swiss_first_round(
-                self.menu, self.historic, tournaments, tournament, player
+                menu, historic, tournaments, tournament, player
+            )
+        elif menu.name == self.menu_swiss_following_round.name:
+            self.run_swiss_following_round(
+                menu, historic, tournaments, tournament, player
             )
 
-    def run_home(self, menu, historic, tournaments=dict(), tournament=None, player=None):
+    def run_home(
+        self, menu, historic, tournaments, tournament=None, player=None
+    ):
         # Choosing between tournaments management, players management, reports editing, save, load  or quit
-        self.choice = ""
-        while self.choice.upper() not in [key for key in menu.submenus.keys()]:
-            self.choice = self.view.choose_submenu(menu, historic, tournament, player)
-        if self.choice.upper() == self.menu_quit.id:
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.choose_submenu(menu, historic, tournament, player)
+        if choice.upper() == self.menu_quit.id:
             exit()
-        elif self.choice.upper() == self.menu_tournament.id:
-            self.historic = historic
-            self.historic.append(self.menu_tournament)
+        elif choice.upper() == self.menu_tournament.id:
+            historic.append(self.menu_tournament)
             self.run_tournament(
-                self.menu_tournament, self.historic, tournaments, tournament, player
+                self.menu_tournament, historic, tournaments, tournament, player
             )
-        elif self.choice.upper() == self.menu_player.id:
-            self.historic = historic
-            self.historic.append(self.menu_player)
+        elif choice.upper() == self.menu_player.id:
+            historic.append(self.menu_player)
             self.run_player(
-                self.menu_player, self.historic, tournaments, tournament, player
+                self.menu_player, historic, tournaments, tournament, player
             )
-        elif self.choice.upper() == self.menu_reports.id:
+        elif choice.upper() == self.menu_reports.id:
             # menu reports
             print("Menu Rapports --> à implémenter")
             exit()
-        elif self.choice.upper() == self.menu_management.id:
-            self.historic = historic
-            self.historic.append(self.menu_management)
+        elif choice.upper() == self.menu_management.id:
+            historic.append(self.menu_management)
             self.run_management(
-                self.menu_management, self.historic, tournaments, tournament, player
+                self.menu_management, historic, tournaments, tournament, player
             )
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_home(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
 
     def run_management(self, menu, historic, tournaments, tournament, player):
-        self.choice = ""
-        while self.choice.upper() not in [key for key in menu.submenus.keys()]:
-            self.choice = self.view.choose_submenu(
-                menu, historic, tournament, player
-            )
-        if self.choice.upper() == self.menu_quit.id:
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.choose_submenu(menu, historic, tournament, player)
+        if choice.upper() == self.menu_quit.id:
             exit()
-        elif self.choice.upper() == self.menu_back.id:
+        elif choice.upper() == self.menu_back.id:
             self.run_back(historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_management(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
-        elif self.choice.upper() == self.menu_start_tournament.id:
+        elif choice.upper() == self.menu_start_tournament.id:
             if tournament is None:
                 self.edit.no_tournament_to_edit()
                 self.run_management(menu, historic, tournaments, tournament, player)
             else:
-                self.historic = historic
-                self.historic.append(self.menu_start_tournament)
+                historic.append(self.menu_start_tournament)
                 self.run_start_tournament(
                     self.menu_start_tournament,
-                    self.historic,
+                    historic,
                     tournaments,
                     tournament,
                     player,
                 )
-        elif self.choice.upper() == self.menu_resume_tournament.id:
+        elif choice.upper() == self.menu_resume_tournament.id:
             if tournament is None:
                 self.edit.no_tournament_to_edit()
                 self.run_management(menu, historic, tournaments, tournament, player)
             else:
-                self.historic = historic
                 if len(tournament.rounds) == 0:
-                    self.historic.append(self.menu_resume_tournament)
+                    historic.append(self.menu_resume_tournament)
                     self.run_resume_tournament(
                         self.menu_resume_tournament,
-                        self.historic,
+                        historic,
                         tournaments,
                         tournament,
                         player,
                     )
                 elif len(tournament.rounds) == 1:
-                    self.historic.append(self.menu_swiss_first_round)
+                    historic.append(self.menu_swiss_first_round)
                     self.run_swiss_first_round(
                         self.menu_swiss_first_round,
-                        self.historic,
+                        historic,
                         tournaments,
                         tournament,
                         player,
                     )
                 else:
-                    print("A implémenter")
+                    historic.append(self.menu_swiss_following_round)
+                    self.run_swiss_following_round(self.menu_swiss_following_round, historic, tournaments, tournament, player)
 
     def run_tournament(self, menu, historic, tournaments, tournament, player):
         """Interact with Views and Models
@@ -200,51 +197,48 @@ class Controller:
         # loading an existing tournament
         # creating a new tournament
         # editing a tournament
-        self.choice = ""
-        while self.choice.upper() not in [key for key in menu.submenus.keys()]:
-            self.choice = self.view.choose_submenu(
-                menu, historic, tournament, player
-            )
-        if self.choice.upper() == self.menu_quit.id:
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.choose_submenu(menu, historic, tournament, player)
+        if choice.upper() == self.menu_quit.id:
             exit()
-        elif self.choice.upper() == self.menu_back.id:
+        elif choice.upper() == self.menu_home.id:
+            historic.append(self.menu_home)
+            self.run_home(self.menu_home, historic, tournaments, tournament, player)
+        elif choice.upper() == self.menu_back.id:
             self.run_back(historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_tournament(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
-        elif self.choice == self.menu_load_a_tournament.id:
-            self.historic = historic
-            self.historic.append(self.menu_load_a_tournament)
+        elif choice == self.menu_load_a_tournament.id:
+            historic.append(self.menu_load_a_tournament)
             self.run_load_a_tournament(
                 self.menu_load_a_tournament,
-                self.historic,
+                historic,
                 tournaments,
                 tournament,
                 player,
             )
-        elif self.choice == self.menu_create_a_tournament.id:
-            # create a tournament
-            self.historic = historic
-            self.historic.append(self.menu_create_a_tournament)
+        elif choice == self.menu_create_a_tournament.id:
+            historic.append(self.menu_create_a_tournament)
             self.run_create_a_tournament(
                 self.menu_create_a_tournament,
-                self.historic,
+                historic,
                 tournaments,
                 tournament,
                 player,
             )
         else:
-            # edit a tournament
             if tournament is None:
                 self.edit.no_tournament_to_edit()
                 self.run_tournament(menu, historic, tournaments, tournament, player)
             else:
-                self.historic.append(self.menu_edit_tournament)
+                historic.append(self.menu_edit_tournament)
                 self.run_edit_a_tournament(
                     self.menu_edit_tournament,
-                    self.historic,
+                    historic,
                     tournaments,
                     tournament,
                     player,
@@ -252,37 +246,33 @@ class Controller:
 
     def run_player(self, menu, historic, tournaments, tournament, player):
         """Interact with Views and Models
-        and manage tournament menu"""
+        and manage player menu"""
         # Asks user to choose between
         # loading an existing player
         # creating a new player
         # editing a player
-        self.choice = ""
-        while self.choice.upper() not in [key for key in menu.submenus.keys()]:
-            self.choice = self.view.choose_submenu(
-                menu, historic, tournament, player
-            )
-        if self.choice.upper() == self.menu_quit.id:
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.choose_submenu(menu, historic, tournament, player)
+        if choice.upper() == self.menu_quit.id:
             exit()
-        elif self.choice.upper() == self.menu_back.id:
+        elif choice.upper() == self.menu_back.id:
             self.run_back(historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_player(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
-        elif self.choice.upper() == self.menu_load_a_player.id:
-            self.historic = historic
-            self.historic.append(self.menu_load_a_player)
+        elif choice.upper() == self.menu_load_a_player.id:
+            historic.append(self.menu_load_a_player)
             self.run_load_a_player(
-                self.menu_load_a_player, self.historic, tournaments, tournament, player
+                self.menu_load_a_player, historic, tournaments, tournament, player
             )
-        elif self.choice == self.menu_create_a_player.id:
-            self.historic = historic
-            self.historic.append(self.menu_create_a_player)
+        elif choice == self.menu_create_a_player.id:
+            historic.append(self.menu_create_a_player)
             self.run_create_a_player(
                 self.menu_create_a_player,
-                self.historic,
+                historic,
                 tournaments,
                 tournament,
                 player,
@@ -293,10 +283,10 @@ class Controller:
                 self.edit.no_player_to_edit()
                 self.run_player(menu, historic, tournaments, tournament, player)
             else:
-                self.historic.append(self.menu_edit_player)
+                historic.append(self.menu_edit_player)
                 self.run_edit_a_player(
                     self.menu_edit_player,
-                    self.historic,
+                    historic,
                     tournaments,
                     tournament,
                     player,
@@ -311,10 +301,9 @@ class Controller:
             self.run_back(historic, tournaments, tournament, player)
         if tournament.status == "ended":
             self.view.tournament_ended(tournament)
-            self.historic = historic
-            self.historic.append(self.menu_tournament)
+            historic.append(self.menu_tournament)
             self.run_tournament(
-                self.menu_tournament, self.historic, tournaments, tournament, player
+                self.menu_tournament, historic, tournaments, tournament, player
             )
         self.view.menu_headers(menu, historic, tournament, player)
         self.report.display_tournament_players_by_rank(tournament)
@@ -333,10 +322,10 @@ class Controller:
             exit()
         elif choice.upper() == self.menu_back.id:
             self.run_back(historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_start_tournament(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
         elif (choice.upper() == "N" and tournament.system == "swiss") or (
             choice.upper() == "Y" and tournament.system != "swiss"
@@ -346,43 +335,41 @@ class Controller:
             self.run_start_tournament(menu, historic, tournaments, tournament, player)
         elif choice.upper() == "Y" and tournament.system == "swiss":
             tournament.set_new_value("status", "in progress")
-            self.db.save_tournaments({tournament.id: tournament})
-            self.historic = historic
-            self.historic.append(self.menu_resume_tournament)
+            self.db.save_tournaments(tournaments)
+            historic.append(self.menu_resume_tournament)
             self.run_resume_tournament(
                 self.menu_resume_tournament,
-                self.historic,
+                historic,
                 tournaments,
                 tournament,
                 player,
             )
 
     def run_swiss(self, menu, historic, tournaments, tournament, player):
-        # tri des joueurs par rang et par score
-        s1 = sorted(tournament.scores.items(), key=lambda item: item[0].rank)
-        s2 = sorted(s1, key=lambda item: item[1])
+        # players are sorted
+        s1 = sorted(tournament.scores.items(), key=lambda item: item[0].rank)  # by rank
+        s2 = sorted(s1, key=lambda item: item[1])  # then by score
         tournament.players = []
         for t_player in s2:
             tournament.players.append(t_player[0])
-        self.choice = ""
-        while self.choice.upper() not in [key for key in menu.submenus.keys()]:
-            self.choice = self.view.swiss_sort_players(menu, historic, tournament)
-        if self.choice.upper() == self.menu_quit.id:
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.swiss_sort_players(menu, historic, tournament)
+        if choice.upper() == self.menu_quit.id:
             exit()
-        elif self.choice.upper() == self.menu_back.id:
+        elif choice.upper() == self.menu_back.id:
             self.historic.pop()
             self.run_back(historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_save.id:
+        elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_swiss(menu, historic, tournaments, tournament, player)
-        elif self.choice.upper() == self.menu_load.id:
+        elif choice.upper() == self.menu_load.id:
             self.load_program()
-        elif self.choice.upper() == self.menu_swiss_first_round.id:
-            self.historic = historic
-            self.historic.append(self.menu_swiss_first_round)
+        elif choice.upper() == self.menu_swiss_first_round.id:
+            historic.append(self.menu_swiss_first_round)
             self.run_swiss_first_round(
                 self.menu_swiss_first_round,
-                self.historic,
+                historic,
                 tournaments,
                 tournament,
                 player,
@@ -393,31 +380,55 @@ class Controller:
             self.swiss_generate_first_round(tournament)
 
         valid_choices = []
-        valid_choices.extend(
-            str(tournament.rounds[-1].matchs.index(match))
-            for match in tournament.rounds[-1].matchs
-        )
+        for match in tournament.rounds[-1].matchs:
+            if match not in tournament.players:
+                valid_choices.extend(str(tournament.rounds[-1].matchs.index(match)))
         valid_choices.extend(key for key in menu.submenus.keys())
         valid_choices.remove(self.menu_swiss_match_result.id)
         choice = ""
         while choice.upper() not in valid_choices:
-            choice = self.view.swiss_round_matchs_first_round(
+            choice = self.view.swiss_round_matchs(
                 menu, historic, tournament
             )
         if choice.upper() == self.menu_quit.id:
             exit()
-        elif choice.upper() == self.menu_back.id:
-            self.run_back(historic, tournaments, tournament, player)
+        elif choice.upper() == self.menu_home.id:
+            self.run_home(self.menu_home, historic, tournaments, tournament, player)
         elif choice.upper() == self.menu_load.id:
             self.load_program()
         elif choice.upper() == self.menu_save.id:
             self.save_program(historic, tournaments, tournament, player)
             self.run_swiss_first_round(menu, historic, tournaments, tournament, player)
         elif choice.upper() == self.menu_swiss_following_round.id:
-            print("Tour suivant")
-            exit()
+            for match in tournament.rounds[-1].matchs:
+                if match not in tournament.players and match.score1 == 0 and match.score2 == 0  :
+                    self.view.some_results_missing(tournament)
+                    self.run_swiss_first_round(menu, historic, tournaments, tournament, player)
+            for match in tournament.rounds[-1].matchs:
+                if match in tournament.players:
+                    tournament.scores[match] += 1  # victory for the singleton player
+            self.swiss_generate_following_round(menu, historic, tournaments, tournament, player)
         else:
             result = ""
+            if (
+                tournament.rounds[-1].matchs[int(choice)].score1 != 0
+                or tournament.rounds[-1].matchs[int(choice)].score2 != 0
+            ):
+                result_reset = ""
+                while result_reset.upper() not in ["Y", "N"]:
+                    result_reset = self.view.match_result_already_completed(tournament.rounds[-1].matchs[int(choice)])
+                if result_reset.upper() == "Y":
+                    tournament.scores[
+                        tournament.rounds[-1].matchs[int(choice)].player1
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score1
+                    tournament.scores[
+                        tournament.rounds[-1].matchs[int(choice)].player2
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score2
+                    tournament.rounds[-1].matchs[int(choice)].score1 = 0
+                    tournament.rounds[-1].matchs[int(choice)].score2 = 0
+                    self.run_swiss_first_round(menu, historic, tournaments, tournament, player)
+                else:
+                    self.run_swiss_first_round(menu, historic, tournaments, tournament, player)
             while result.upper() not in [
                 "N",
                 "C",
@@ -435,7 +446,7 @@ class Controller:
                     menu, historic, tournaments, tournament, player
                 )
             elif result.upper() == "N":
-                print("Match nul")
+                self.view.draw(tournament.rounds[-1].matchs[int(choice)])
                 # update match scores
                 tournament.rounds[-1].matchs[int(choice)].score1 += 0.5
                 tournament.rounds[-1].matchs[int(choice)].score2 += 0.5
@@ -446,23 +457,19 @@ class Controller:
                 tournament.scores[
                     tournament.rounds[-1].matchs[int(choice)].player2
                 ] += 0.5
-            elif result == str(tournament.rounds[-1].matchs[int(choice)].player1.id):
-                print(
-                    f"Victoire de {tournament.rounds[-1].matchs[int(choice)].player1}"
-                )
+            elif result == str(self.tournament.rounds[-1].matchs[int(choice)].player1.id):
+                self.view.victory1(tournament.rounds[-1].matchs[int(choice)])
                 tournament.rounds[-1].matchs[int(choice)].score1 += 1
                 tournament.scores[
                     tournament.rounds[-1].matchs[int(choice)].player1
                 ] += 1
             else:
-                print(
-                    f"Victoire de {tournament.rounds[-1].matchs[int(choice)].player2}"
-                )
+                self.view.victory2(tournament.rounds[-1].matchs[int(choice)])
                 tournament.rounds[-1].matchs[int(choice)].score2 += 1
                 tournament.scores[
                     tournament.rounds[-1].matchs[int(choice)].player2
                 ] += 1
-            self.db.save_tournaments({tournament.id: tournament})
+            self.db.save_tournaments(tournaments)
             self.edit.save_ok()
             self.run_swiss_first_round(menu, historic, tournaments, tournament, player)
 
@@ -470,16 +477,15 @@ class Controller:
         # distribute players in best half and lowest half
         first_half = tournament.players.copy()
         second_half = []
-        singleton = []
         # verify if number of players is odd number
-        # player with lowest score/rank is sigleton for this round
+        # player with lowest score/rank is singleton for this round
         # player can be singleton only once
-        if len(tournament.players) // 2 != 0:
-            rev_i = -1
-            while tournament.players[rev_i] in singleton:
+        rev_i = -1
+        if len(tournament.players) % 2 != 0:
+            while tournament.players[rev_i] in tournament.singleton:
                 rev_i -= 1
-        singleton.append(tournament.players[rev_i])
-        first_half.remove(tournament.players[rev_i])
+            tournament.singleton.append(tournament.players[rev_i])
+            first_half.remove(tournament.players[rev_i])
         # generation of the two halves of players
         while len(first_half) > len(second_half):
             second_half.append(first_half.pop())
@@ -490,29 +496,186 @@ class Controller:
         for player1, player2 in zip(first_half, second_half):
             match = Match(player1, player2, tournament)
             matchs.append(match)
-        if singleton[-1] not in first_half and singleton[-1] not in second_half:
-            matchs.append(singleton[-1])
+        if len(tournament.players) % 2 != 0:
+            matchs.append(tournament.singleton[-1])
         tournament.generate_round(Round("Round 1", matchs))
         self.db.save_tournaments({tournament.id: tournament})
         self.edit.save_ok()
         return tournament
 
+    def run_swiss_following_round(self, menu, historic, tournaments, tournament, player):
+        valid_choices = []
+        for match in tournament.rounds[-1].matchs:
+            if match not in tournament.players:
+                valid_choices.extend(str(tournament.rounds[-1].matchs.index(match)))
+        menu.submenus[self.menu_swiss_match_result.id] = self.menu_swiss_match_result
+        valid_choices.extend(key for key in menu.submenus.keys())
+        valid_choices.remove(self.menu_swiss_match_result.id)
+        choice = ""
+        while choice.upper() not in valid_choices:
+            choice = self.view.swiss_round_matchs(menu, historic, tournament)
+        if choice.upper() == self.menu_quit.id:
+            exit()
+        elif choice.upper() == self.menu_home.id:
+            self.run_home(self.menu_home, historic, tournaments, tournament, player)
+        elif choice.upper() == self.menu_load.id:
+            self.load_program()
+        elif choice.upper() == self.menu_save.id:
+            self.save_program(historic, tournaments, tournament, player)
+            self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+        elif choice.upper() == self.menu_swiss_following_round.id:
+            for match in tournament.rounds[-1].matchs:
+                if match not in tournament.players and match.score1 == 0 and match.score2 == 0:
+                    self.view.some_results_missing(tournament)
+                    self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+            for match in tournament.rounds[-1].matchs:
+                if match in tournament.players:
+                    tournament.scores[match] += 1
+            if len(tournament.rounds) == tournament.nb_rounds:
+                s1 = sorted(tournament.scores.items(), key=lambda item: item[0].rank)  # by rank
+                s2 = sorted(s1, key=lambda item: item[1], reverse=True)  # by score
+                tournament.players = []
+                for t_player in s2:
+                    tournament.players.append(t_player[0])
+                self.view.swiss_final_results(menu, historic, tournament)
+                tournament.set_new_value("status", "ended")
+                self.db.save_tournaments({tournament.id:tournament})
+                historic.append(self.menu_home)
+                self.run_home(self.menu_home, historic, tournaments, tournament, player)
+            else:
+                self.swiss_generate_following_round(menu, historic, tournaments, tournament, player)
+        else:
+            result = ""
+            if (tournament.rounds[-1].matchs[int(choice)].score1 != 0 or tournament.rounds[-1].matchs[int(choice)].score2 != 0):
+                result_reset = ""
+                while result_reset.upper() not in ["Y", "N"]:
+                    result_reset = self.view.match_result_already_completed(tournament.rounds[-1].matchs[int(choice)])
+                if result_reset.upper() == "Y":
+                    tournament.scores[tournament.rounds[-1].matchs[int(choice)].player1] -= tournament.rounds[-1].matchs[int(choice)].score1
+                    tournament.scores[tournament.rounds[-1].matchs[int(choice)].player2] -= tournament.rounds[-1].matchs[int(choice)].score2
+                    tournament.rounds[-1].matchs[int(choice)].score1 = 0
+                    tournament.rounds[-1].matchs[int(choice)].score2 = 0
+                    self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+                else:
+                    self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+            while result.upper() not in ["N","C",
+                    str(tournament.rounds[-1].matchs[int(choice)].player1.id),
+                    str(tournament.rounds[-1].matchs[int(choice)].player2.id),
+                ]:
+                result = self.view.enter_match_result(menu,
+                        historic,
+                        tournament,
+                        tournament.rounds[-1].matchs[int(choice)])
+            if result.upper() == "C":
+                self.run_swiss_first_round(
+                        menu, historic, tournaments, tournament, player
+                    )
+            elif result.upper() == "N":
+                self.view.draw(tournament.rounds[-1].matchs[int(choice)])
+                # update match scores
+                tournament.rounds[-1].matchs[int(choice)].score1 += 0.5
+                tournament.rounds[-1].matchs[int(choice)].score2 += 0.5
+                # update players score in tournament
+                tournament.scores[tournament.rounds[-1].matchs[int(choice)].player1] += 0.5
+                tournament.scores[tournament.rounds[-1].matchs[int(choice)].player2] += 0.5
+            elif result == str(tournament.rounds[-1].matchs[int(choice)].player1.id):
+                self.view.victory1(tournament.rounds[-1].matchs[int(choice)])
+                tournament.rounds[-1].matchs[int(choice)].score1 += 1
+                tournament.scores[tournament.rounds[-1].matchs[int(choice)].player1] += 1
+            else:
+                self.view.victory2(tournament.rounds[-1].matchs[int(choice)])
+                tournament.rounds[-1].matchs[int(choice)].score2 += 1
+                tournament.scores[tournament.rounds[-1].matchs[int(choice)].player2] += 1
+            self.db.save_tournaments({tournament.id: tournament})
+            self.edit.save_ok()
+            self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+
+    def swiss_generate_following_round(self, menu, historic, tournaments, tournament, player):
+        historic.append(self.menu_swiss_following_round)
+        s1 = sorted(tournament.scores.items(), key=lambda item: item[0].rank) # by rank
+        s2 = sorted(s1, key=lambda item: item[1], reverse=True)  # by score
+        tournament.players = []
+        for t_player in s2:
+            tournament.players.append(t_player[0])
+        choice = ""
+        while choice.upper() not in [key for key in menu.submenus.keys()]:
+            choice = self.view.swiss_sort_players(self.menu_swiss_following_round, historic, tournament)
+        if choice.upper() == self.menu_quit.id:
+            exit()
+        elif choice.upper() == self.menu_home.id:
+            self.run_home(self.menu_home, historic, tournaments, tournament, player)
+        elif choice.upper() == self.menu_save.id:
+            self.save_program(historic, tournaments, tournament, player)
+            self.swiss_generate_following_round(
+                menu, historic, tournaments, tournament, player
+            )
+        elif choice.upper() == self.menu_load.id:
+            self.load_program()
+        else:
+            # generating matchs for this round
+            matchs = []
+            first_players = list(tournament.players)
+            second_players = list(tournament.players)
+            rev_i = -1
+            if len(tournament.players) % 2 != 0:
+                while tournament.players[rev_i] in tournament.singleton:
+                    rev_i -= 1
+                tournament.singleton.append(tournament.players[rev_i])
+                first_players.remove(tournament.singleton[-1])
+                second_players.remove(tournament.singleton[-1])
+
+            while first_players:
+                second_players.remove(second_players[0])
+                x = 0
+                appairing = 0
+                match = None
+
+                while appairing == 0:
+                    flag = 0
+                    match = Match(first_players[0], second_players[x], tournament)
+                    for round in tournament.rounds:
+                        for past_match in round.matchs:
+                            if past_match in tournament.players:
+                                break
+                            if (
+                                    match.player1 == past_match.player1
+                                    and match.player2 == past_match.player2
+                                    or match.player1 == past_match.player2
+                                    and match.player2 == past_match.player1
+                            ):
+                                if len(first_players) > 2:
+                                    x += 1
+                                    flag = 1
+                                    break
+                    if flag == 0:
+                        appairing = 1
+
+                matchs.append(match)
+                first_players.remove(first_players[0])
+                first_players.remove(second_players[x])
+                second_players.remove(second_players[x])
+            if len(tournament.players) % 2 != 0:
+                matchs.append(tournament.singleton[-1])
+            tournament.generate_round(Round("Round "+str(len(tournament.rounds)+1), matchs))
+            self.db.save_tournaments({tournament.id: tournament})
+            self.edit.save_ok()
+            self.run_swiss_following_round(menu, historic, tournaments, tournament, player)
+
+
     def run_resume_tournament(self, menu, historic, tournaments, tournament, player):
         if tournament.status == "ended":
             self.view.tournament_ended(tournament)
-            self.historic = historic
-            self.historic.append(self.menu_tournament)
+            historic.append(self.menu_tournament)
             self.run_tournament(
-                self.menu_tournament, self.historic, tournaments, tournament, player
+                self.menu_tournament, historic, tournaments, tournament, player
             )
         elif tournament.status == "upcoming":
             self.view.tournament_upcoming(tournament)
             self.run_back(historic, tournaments, tournament, player)
         elif tournament.status == "in progress" and tournament.system == "swiss":
-            self.historic = historic
-            self.historic.append(self.menu_swiss)
+            historic.append(self.menu_swiss)
             self.run_swiss(
-                self.menu_swiss, self.historic, tournaments, tournament, player
+                self.menu_swiss, historic, tournaments, tournament, player
             )
         else:
             exit()
@@ -547,7 +710,9 @@ class Controller:
             self.run_back(historic, self.tournaments, tournament, player)
         elif self.choice.upper() == self.menu_save.id:
             self.save_program(historic, self.tournaments, tournament, player)
-            self.run_load_a_tournament(menu, historic, self.tournaments, tournament, player)
+            self.run_load_a_tournament(
+                menu, historic, self.tournaments, tournament, player
+            )
         elif self.choice.upper() == self.menu_load.id:
             self.load_program()
         # Determination of the tournament corresponding to the entered id
@@ -578,9 +743,7 @@ class Controller:
             [self.menu_quit.id, self.menu_back.id, self.menu_save.id, self.menu_load.id]
         )
         while self.choice.upper() not in valid_choices:
-            self.display_all_players(
-                menu, historic, self.players, tournament, player
-            )
+            self.display_all_players(menu, historic, self.players, tournament, player)
             self.choice = self.view.select_a_loaded_element(menu)
         # Quit [Q]
         if self.choice.upper() == self.menu_quit.id:
@@ -647,9 +810,16 @@ class Controller:
         else:
             try:
                 for existing_tournament in self.db.load_tournaments().values():
-                    if (new_name == existing_tournament.name and new_town == existing_tournament.town):
-                        self.edit.alert_creating_an_existing_tournament(existing_tournament)
-                        self.run_create_a_tournament(menu, historic, tournaments, tournament, player)
+                    if (
+                        new_name == existing_tournament.name
+                        and new_town == existing_tournament.town
+                    ):
+                        self.edit.alert_creating_an_existing_tournament(
+                            existing_tournament
+                        )
+                        self.run_create_a_tournament(
+                            menu, historic, tournaments, tournament, player
+                        )
             except Exception as error:
                 pass
         choice = ""
@@ -659,7 +829,7 @@ class Controller:
             self.edit.modification_validated()
             new_tournament = Tournament(new_name, new_town, new_country)
             self.tournaments[new_tournament.id] = new_tournament
-            self.db.save_tournaments({new_tournament.id:new_tournament})
+            self.db.save_tournaments({new_tournament.id: new_tournament})
             self.edit.save_ok()
         else:
             self.edit.modification_cancelled()
@@ -677,20 +847,17 @@ class Controller:
                 "first_half",
                 "second_half",
                 "translation",
+                "singleton"
             ]:
                 pass
             else:
                 self.menu.choices[str(index)] = param
         valid_choices = [param for param in self.menu.choices.keys()]
         valid_choices.extend(menu.submenus.keys())
-        self.report.display_selected_tournament(
-            menu, historic, tournament, player
-        )
+        self.report.display_selected_tournament(menu, historic, tournament, player)
 
         while self.choice.upper() not in valid_choices:
-            self.report.display_selected_tournament(
-                menu, historic, tournament, player
-            )
+            self.report.display_selected_tournament(menu, historic, tournament, player)
             self.choice = self.edit.edit_element(menu)
         if self.choice.upper() == self.menu_quit.id:
             exit()
@@ -744,7 +911,9 @@ class Controller:
                 )
             else:
                 self.edit.modification_cancelled()
-            self.run_edit_a_tournament(menu, historic, self.tournaments, tournament, player)
+            self.run_edit_a_tournament(
+                menu, historic, self.tournaments, tournament, player
+            )
 
     def run_edit_a_player(self, menu, historic, tournaments, tournament, player):
         self.choice = ""
@@ -772,6 +941,9 @@ class Controller:
         elif self.choice.upper() == self.menu_add_player_to_tournament.id:
             if tournament is None:
                 self.edit.no_tournament_to_edit()
+            elif tournament.status == "ended":
+                self.view.tournament_ended(tournament)
+                self.run_edit_a_player(menu, historic, tournaments, tournament, player)
             else:
                 self.choice = ""
                 while self.choice.upper() not in ["Y", "N"]:
@@ -935,7 +1107,7 @@ class Controller:
         self.historic = []
         self.current_menu = None
         # Level 1
-        self.menu_home = Menu("Accueil", "0")
+        self.menu_home = Menu("Accueil", "H")
         self.menu_home.path = [self.menu_home]
         # Level 2
         self.menu_management = Menu("Gestion du tournoi", "M")
@@ -1170,10 +1342,19 @@ class Controller:
         self.menu_swiss_first_round.submenus[
             self.menu_swiss_following_round.id
         ] = self.menu_swiss_following_round
-        self.menu_swiss_first_round.submenus[self.menu_back.id] = self.menu_back
+        self.menu_swiss_first_round.submenus[self.menu_home.id] = self.menu_home
         self.menu_swiss_first_round.submenus[self.menu_quit.id] = self.menu_quit
         self.menu_swiss_first_round.submenus[self.menu_save.id] = self.menu_save
         self.menu_swiss_first_round.submenus[self.menu_load.id] = self.menu_load
+
+        # submenus for swiss following round
+        self.menu_swiss_following_round.submenus[
+            self.menu_swiss_following_round.id
+        ] = self.menu_swiss_following_round
+        self.menu_swiss_following_round.submenus[self.menu_home.id] = self.menu_home
+        self.menu_swiss_following_round.submenus[self.menu_quit.id] = self.menu_quit
+        self.menu_swiss_following_round.submenus[self.menu_save.id] = self.menu_save
+        self.menu_swiss_following_round.submenus[self.menu_load.id] = self.menu_load
 
         # submenus for tournament
         self.menu_tournament.submenus[
@@ -1185,6 +1366,7 @@ class Controller:
         self.menu_tournament.submenus[
             self.menu_edit_tournament.id
         ] = self.menu_edit_tournament
+        self.menu_tournament.submenus[self.menu_home.id] = self.menu_home
         self.menu_tournament.submenus[self.menu_back.id] = self.menu_back
         self.menu_tournament.submenus[self.menu_quit.id] = self.menu_quit
         self.menu_tournament.submenus[self.menu_save.id] = self.menu_save
@@ -1262,21 +1444,5 @@ class Controller:
         self.create_menus()
         """choose main menu"""
         self.historic.append(self.menu_home)
-        self.run_home(self.menu_home, self.historic)
+        self.run_home(self.menu_home, self.historic, self.tournaments)
         exit()
-
-        for num_round in range(1, self.tournament.nb_rounds + 1):
-            if num_round == 1:
-                self.tournament.sort_players()
-                self.tournament.first_round_sort_players()
-                self.matchs = self.tournament.first_matchs()
-                self.tournament.generate_round(Round("Round 1", self.matchs))
-                self.tournament.generate_results(self.tournament.rounds[0])
-                self.tournament.sort_players()
-                self.tournament.display_scores()
-            else:
-                self.matchs = self.tournament.other_matchs()
-                self.tournament.generate_round(Round(f"Round {num_round}", self.matchs))
-                self.tournament.generate_results(self.tournament.rounds[num_round - 1])
-                self.tournament.sort_players()
-                self.tournament.display_scores()

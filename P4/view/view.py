@@ -77,12 +77,38 @@ class View:
         print(f"Il n'y a actuellement aucun participant pour le tournoi {tournament}.")
         time.sleep(2)
 
+    def match_result_already_completed(self, match):
+        print(f"Vous avez déjà entré le résultat du match {match}")
+        print("Confirmez la réinitialisation de ce résultat [Y]")
+        print('Ou revenez à la liste des matchs en cours [N]')
+        return input("-->  ")
+
+    def some_results_missing(self, tournament):
+        print(f"Vous n'avez pas entré tous les résultats du {tournament.rounds[-1].name}")
+        print(f"Veuillez compléter vos saisies avant de lancer le tour suivant")
+        time.sleep(5)
+
     def system_of_tournament(self, tournament):
         print(f"Le tournoi {tournament} a été créé comme tournoi de système {tournament.system}")
         print(f"Confirmez-vous le système de tournoi [Y]/[N] : ?")
         print("Revenir au menu précédent [B]")
         print("Quitter                   [Q]")
         return input("--> ")
+
+    def draw(self, match):
+        print(f"Match nul entre {match.player1} et {match.player2}")
+        print(f"{match.player1} + 0.5 point")
+        print(f"{match.player2} + 0.5 point")
+
+    def victory1(self, match):
+        print(f"Victoire {match.player1} sur {match.player2}")
+        print(f"{match.player1} + 1 point")
+        print(f"{match.player2} + 0 point")
+
+    def victory2(self, match):
+        print(f"Victoire {match.player2} sur {match.player1}")
+        print(f"{match.player2} + 1 point")
+        print(f"{match.player1} + 0 point")
 
     def swiss_sort_players(self, menu, historic, tournament):
         os.system('clear')
@@ -91,7 +117,11 @@ class View:
         print(f"{path_menu}")
         print(f"Historique : {historic_menu}")
         print(f"Tournoi : {tournament}  --- système {tournament.system}")
-        print("Présentation des joueurs du tournoi :")
+        print("Score des joueurs du tournoi ", end="")
+        if len(tournament.rounds)==0:
+            print("avant le premier tour")
+        else:
+            print(f"à l'issue du {tournament.rounds[-1].name}")
         print(f"{'Nom':<10} {'Prénom':<15} {'Classement':<15} {'Score':<5}")
         for player in tournament.players:
             print(f"{player.lastname:<10} {player.firstname:<15} {player.rank:<15} {tournament.scores[player]:<5}")
@@ -99,7 +129,24 @@ class View:
             print(f"{option[1].name:<35} [{option[0]}]")
         return input("--> ")
 
-    def swiss_round_matchs_first_round(self, menu, historic, tournament):
+    def swiss_final_results(self, menu, historic, tournament):
+        os.system('clear')
+        path_menu = self.path_and_historic(menu.path)
+        historic_menu = self.path_and_historic(historic)
+        print(f"{path_menu}")
+        print(f"Historique : {historic_menu}")
+        print(f"Tournoi : {tournament}  --- système {tournament.system}")
+        print("Fin du tournoi")
+        print("Score des joueurs du tournoi ")
+        print(f"{'Nom':<10} {'Prénom':<15} {'Classement':<15} {'Score':<5}")
+        for player in tournament.players:
+            print(f"{player.lastname:<10} {player.firstname:<15} {player.rank:<15} {tournament.scores[player]:<5}")
+        print(f"\n***** Victoire de {tournament.players[0].firstname} {tournament.players[0].lastname} *****\n")
+        print("Pressez une touche pour revenir à l'accueil")
+        return input("--> ")
+
+
+    def swiss_round_matchs(self, menu, historic, tournament):
         os.system('clear')
         path_menu = self.path_and_historic(menu.path)
         historic_menu = self.path_and_historic(historic)
@@ -111,7 +158,7 @@ class View:
             if match in tournament.players:
                 print(f"Flotteur : {match.firstname:>15} {match.lastname:<47}{tournament.scores[match]}\n")
             else:
-                print(f"{match} {tournament.scores[match.player1]}-{tournament.scores[match.player1]:<10} [{tournament.rounds[-1].matchs.index(match)}]\n")
+                print(f"{match} {tournament.scores[match.player1]}-{tournament.scores[match.player2]:<10} [{tournament.rounds[-1].matchs.index(match)}]\n")
         for option in menu.submenus.items():
             print(f"{option[1].name:<35} [{option[0]}]")
         return input("--> ")

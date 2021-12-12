@@ -20,7 +20,12 @@ import pickle
 def main():
     # mydb = Data()
     # tournaments = mydb.load_tournaments()
-    # tournaments['3'].rounds = []
+    # print(tournaments['2'].rounds)
+    # print(tournaments['2'].singleton)
+    # print(tournaments['2'].status)
+    # tournaments['2'].status = "upcoming"
+    # tournaments['2'].rounds = []
+    # tournaments['2'].singleton = []
     # mydb.save_tournaments(tournaments)
     # exit()
 
