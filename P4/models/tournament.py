@@ -38,7 +38,7 @@ class Tournament:
         # the following attributes shouldn't be modified by editing the tournament
         # modifications are enabled by specific interactions or by the script itself
         self.rounds = []  # list of round instances
-        self.players = []  # list of player instances
+        self.players = []  # list of players identifiants. To get Player instances
         self.singleton = (
             []
         )  # manage single player when number of tournament players is odd
@@ -80,12 +80,12 @@ class Tournament:
         return str(f"{self.name}")
 
     def add_player(self, player):
-        self.players.append(player)
-        self.scores[player] = 0
+        self.players.append(player.id)
+        self.scores[player.id] = 0
 
     def remove_player(self, player):
-        self.players.remove(player)
-        del self.scores[player]
+        self.players.remove(player.id)
+        del self.scores[player.id]
 
     def sort_players(self):
         self.players.sort(key=lambda x: x.rank)  # players sorted by rank

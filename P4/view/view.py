@@ -7,6 +7,8 @@ Display statistics
 
 import os
 import time
+import curses
+
 
 
 class View:

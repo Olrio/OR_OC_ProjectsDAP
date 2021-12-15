@@ -721,6 +721,7 @@ class Controller:
             for match in tournament.rounds[-1].matchs:
                 if match in tournament.players:
                     tournament.scores[match] += 1  # victory for the singleton player
+            tournament.rounds[-1].get_end_time()
             self.swiss_generate_following_round(
                 menu, historic, tournaments, tournament, player
             )
@@ -738,10 +739,10 @@ class Controller:
                 if result_reset.upper() == "Y":
                     tournament.scores[
                         tournament.rounds[-1].matchs[int(choice)].player1
-                    ] -= (tournament.rounds[-1].matchs[int(choice)].score1)
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score1
                     tournament.scores[
                         tournament.rounds[-1].matchs[int(choice)].player2
-                    ] -= (tournament.rounds[-1].matchs[int(choice)].score2)
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score2
                     tournament.rounds[-1].matchs[int(choice)].score1 = 0
                     tournament.rounds[-1].matchs[int(choice)].score2 = 0
                     self.run_swiss_first_round(
@@ -821,6 +822,7 @@ class Controller:
         if len(tournament.players) % 2 != 0:
             matchs.append(tournament.singleton[-1])
         tournament.generate_round(Round("Round 1", matchs))
+        tournament.rounds[-1].get_start_time()
         self.db.save_tournaments({tournament.id: tournament})
         self.edit.save_ok()
         return tournament
@@ -873,10 +875,12 @@ class Controller:
                     tournament.players.append(t_player[0])
                 self.view.swiss_final_results(menu, historic, tournament)
                 tournament.set_new_value("status", "ended")
+                tournament.rounds[-1].get_end_time()
                 self.db.save_tournaments({tournament.id: tournament})
                 historic.append(self.menu_home)
                 self.run_home(self.menu_home, historic, tournaments, tournament, player)
             else:
+                tournament.rounds[-1].get_end_time()
                 self.swiss_generate_following_round(
                     menu, historic, tournaments, tournament, player
                 )
@@ -894,10 +898,10 @@ class Controller:
                 if result_reset.upper() == "Y":
                     tournament.scores[
                         tournament.rounds[-1].matchs[int(choice)].player1
-                    ] -= (tournament.rounds[-1].matchs[int(choice)].score1)
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score1
                     tournament.scores[
                         tournament.rounds[-1].matchs[int(choice)].player2
-                    ] -= (tournament.rounds[-1].matchs[int(choice)].score2)
+                    ] -= tournament.rounds[-1].matchs[int(choice)].score2
                     tournament.rounds[-1].matchs[int(choice)].score1 = 0
                     tournament.rounds[-1].matchs[int(choice)].score2 = 0
                     self.run_swiss_following_round(
@@ -1026,6 +1030,7 @@ class Controller:
             tournament.generate_round(
                 Round("Round " + str(len(tournament.rounds) + 1), matchs)
             )
+            tournament.rounds[-1].get_start_time()
             self.db.save_tournaments({tournament.id: tournament})
             self.edit.save_ok()
             self.run_swiss_following_round(
@@ -1057,7 +1062,7 @@ class Controller:
         # display all tournaments
         choice = ""
         tournaments_id = []
-        for t_id in tournaments.keys():
+        for t_id in loc_tournaments.keys():
             tournaments_id.append(t_id)
         self.menu_select_tournament_id.id = tournaments_id
         valid_choices = tournaments_id
@@ -1084,12 +1089,12 @@ class Controller:
             self.load_program()
         # Determination of the tournament corresponding to the entered id
         else:
-            tournament = tournaments[choice]
+            tournament = loc_tournaments[choice]
             historic.append(self.menu_edit_tournament)
             self.run_edit_a_tournament(
                 self.menu_edit_tournament,
                 historic,
-                tournaments,
+                loc_tournaments,
                 tournament,
                 player,
             )
