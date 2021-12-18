@@ -1,43 +1,25 @@
-"""
-Gestion de la classe Joueur
-"""
-
-from models.data import Data
-
+import datetime
 
 class Player:
-    def __init__(self, lastname, firstname, rank=0, lang="fr"):
-        """initialise un nouveau joueur"""
-        self.lastname = lastname  # nom de famille
-        self.firstname = firstname
-        self.birthdate = ""
-        self.gender = ""
-        self.rank = rank
-        self.id = get_id()
-        self.translation = get_translation(lang)
-
-    def set_new_value(self, param, value):
-        self.__setattr__(param, value)
-
-    def modify_rank(self, rank):
-        """possibilité de modifier manuellement le rang d'un joueur"""
-        self.rank = rank
+    def __init__(self):
+        """initialize a new player"""
+        self.lastname = str()
+        self.firstname = str()
+        self.birthdate = datetime.date.today()
+        self.gender = str()
+        self.rank = int()
+        self.ident = str()  # unique identifiant of the player
 
     def __str__(self):
         return f"{self.lastname}, {self.firstname} ({self.rank})"
 
-
-def get_translation(lang):
-    if lang == "fr":
-        return {
-            "lastname": "Nom",
-            "firstname": "Prénom",
-            "birthdate": "Date de naissance",
-            "gender": "Sexe",
-            "rank": "Classement",
-        }
-
-
-def get_id():
-    list_id = Data().list_of_saved_players_id()
-    return str(len(list_id))
+    def get_translation(self, lang):
+        if lang == "fr":
+            return {
+                "lastname": "Nom",
+                "firstname": "Prénom",
+                "rank": "Classement",
+                "ident": "Identifiant",
+                "birthdate": "Date de naissance",
+                "gender": "Sexe"
+            }

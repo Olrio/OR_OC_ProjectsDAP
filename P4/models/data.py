@@ -1,111 +1,109 @@
-"""
-Management of the database for the application
-"""
+import datetime
 
-import pickle
+from models.player import Player
+from models.round import Round
+from models.tournament import Tournament
+from models.match import Match
+from data.simulation import players_data, rounds_data, tournaments_data, matchs_data
 
-
-class Data:
-    """database"""
-
+class DataManager:
     def __init__(self):
-        self.players = {}
-        self.tournaments = {}
+        pass
 
-    @staticmethod
-    def save_program(historic, tournaments, tournament, player):
-        """save the state of the program"""
-        with open("data/state", "wb") as file_program:
-            if tournament:
-                t_id = tournament.id
-            else:
-                t_id = None
-            pickle.dump((historic, player, t_id), file_program)
-        with open("data/tournaments", "wb") as file_program:
-            pickle.dump(tournaments, file_program)
+    def get_players(self, players):
+        for player in players_data.items():
+            players[player[0]] = Player()
+            players[player[0]].ident = player[0]
+            players[player[0]].lastname = player[1][0]
+            players[player[0]].firstname = player[1][1]
+            players[player[0]].rank = player[1][2]
+            players[player[0]].birthdate = datetime.date(player[1][3][0], player[1][3][1], player[1][3][2])
+            players[player[0]].gender = player[1][4]
+        return players
 
-    @staticmethod
-    def load_program():
-        """save the state of the program"""
-        with open("data/state", "rb") as file_program:
-            data_state = pickle.load(file_program)
-        with open("data/tournaments", "rb") as file_program:
-            tournaments = pickle.load(file_program)
-            if data_state[2]:
-                tournament = tournaments[data_state[2]]
-            else:
-                tournament = None
-        state_program = (data_state[0], tournaments, tournament, data_state[1])
-        return state_program
+    def verify_players(self, players):
+        for player in players.values():
+            for attribute in Player().__dict__:
+                if type(player.__getattribute__(attribute)) != type(Player().__getattribute__(attribute)):
+                    print(f"Erreur pour le {player.get_translation('fr')[attribute]} du joueur {player}")
+                    print(f"{player.__getattribute__(attribute)} n'est pas de type {Player().__getattribute__(attribute)}")
+                    exit()
+            if player.gender not in ["M", "F"]:
+                print(f"Le sexe du joueur {player} doit être 'M' ou 'F'")
+                exit()
 
-    def add_tournament(self, tournament):
-        """add a new tournament to the list of tournaments"""
-        if tournament not in self.tournaments.values():
-            self.tournaments[tournament.id] = tournament
+    def get_rounds(self, rounds):
+        for round in rounds_data.items():
+            rounds[round[0]] = Round()
+            rounds[round[0]].ident = round[0]
+            rounds[round[0]].name = round[1][0]
+            rounds[round[0]].players = round[1][1]
+            rounds[round[0]].scores = round[1][2]
+            rounds[round[0]].matchs = round[1][3]
+            rounds[round[0]].start = datetime.datetime(round[1][4][0], round[1][4][1], round[1][4][2], round[1][4][3], round[1][4][4], round[1][4][5])
+            for player in round[1][1]:
+                rounds[round[0]].add_player_score(player)
+        return rounds
 
-    @staticmethod
-    def save_tournaments(tournaments):
-        """save the list of tournaments in a file"""
-        try:
-            with open("data/tournaments", "rb") as file_tournaments:
-                already_saved_files = pickle.load(file_tournaments)
-            if already_saved_files:
-                already_saved_files.update(tournaments)
-            else:
-                already_saved_files = tournaments
-        except FileNotFoundError:
-            already_saved_files = tournaments
-        with open("data/tournaments", "wb") as file_tournaments:
-            pickle.dump(already_saved_files, file_tournaments)
+    def verify_rounds(self, rounds):
+        for round in rounds.values():
+            for attribute in Round().__dict__:
+                if type(round.__getattribute__(attribute)) != type(Round().__getattribute__(attribute)):
+                    print(f"Erreur pour le {round.get_translation('fr')[attribute]} de la ronde {round.name}")
+                    print(f"{round.__getattribute__(attribute)} n'est pas de type {Round().__getattribute__(attribute)}")
+                    exit()
 
-    def load_tournaments(self):
-        """load the dict of tournaments from a file"""
-        try:
-            with open("data/tournaments", "rb") as file_tournaments:
-                self.tournaments = pickle.load(file_tournaments)
-            return self.tournaments
-        except FileNotFoundError:
-            return FileNotFoundError
+    def get_tournaments(self, tournaments):
+        for tournament in tournaments_data.items():
+            tournaments[tournament[0]] = Tournament()
+            tournaments[tournament[0]].ident = tournament[0]
+            tournaments[tournament[0]].name = tournament[1][0]
+            tournaments[tournament[0]].town = tournament[1][1]
+            tournaments[tournament[0]].country = tournament[1][2]
+            tournaments[tournament[0]].date_start = datetime.date(tournament[1][3][0], tournament[1][3][1], tournament[1][3][2])
+            tournaments[tournament[0]].date_end = datetime.date(tournament[1][4][0], tournament[1][4][1],
+                                                                  tournament[1][4][2])
+            tournaments[tournament[0]].status = tournament[1][5]
+            tournaments[tournament[0]].control_time = tournament[1][6]
+            tournaments[tournament[0]].description = tournament[1][7]
+            tournaments[tournament[0]].system = tournament[1][8]
+            tournaments[tournament[0]].nb_rounds = tournament[1][9]
+            tournaments[tournament[0]].rounds = tournament[1][10]
+            tournaments[tournament[0]].players = tournament[1][11]
+            tournaments[tournament[0]].singleton = tournament[1][12]
+        return tournaments
 
-    @staticmethod
-    def list_of_saved_tournaments_id():
-        id_list = []
-        try:
-            with open("data/tournaments", "rb") as file_tournaments:
-                saved_tournaments = pickle.load(file_tournaments)
-            if saved_tournaments:
-                for tournament in saved_tournaments.values():
-                    id_list.append(tournament.id)
-        except FileNotFoundError:
-            pass
-        return id_list
+    def verify_tournaments(self, tournaments):
+        for tournament in tournaments.values():
+            for attribute in Tournament().__dict__:
+                if type(tournament.__getattribute__(attribute)) != type(Tournament().__getattribute__(attribute)):
+                    print(f"Erreur pour le {tournament.get_translation('fr')[attribute]} du tournoi {tournament.name}")
+                    print(f"{tournament.__getattribute__(attribute)} n'est pas de type {Tournament().__getattribute__(attribute)}")
+                    exit()
+                if tournament.status not in ["upcoming", "in progress", "ended"]:
+                    print(f"Le statut du tournoi {tournament.name} doit être 'upcoming', 'in progress' ou 'ended'")
+                    exit()
+                if tournament.control_time not in ["bullet", "blitz", "rapid"]:
+                    print(f"Le type de partie du tournoi {tournament.name} doit être 'bullet', 'blitz' ou 'rapid'")
+                    exit()
 
-    @staticmethod
-    def list_of_saved_players_id():
-        id_list = []
-        with open("data/players", "rb") as file_players:
-            saved_players = pickle.load(file_players)
-        for player in saved_players.values():
-            id_list.append(player.id)
-        return id_list
+    def get_matchs(self, matchs):
+        for match in matchs_data.items():
+            matchs[match[0]] = Match()
+            matchs[match[0]].ident = match[0]
+            matchs[match[0]].data = ([match[1][0][0], match[1][0][1]], [match[1][1][0], match[1][1][1]])
+        return matchs
 
-    def add_players(self, player):
-        """add a new player to the whole list of players"""
-        self.players[player.id] = player
+    def verify_matchs(self, matchs):
+        for match in matchs.values():
+            for attribute in Match().__dict__:
+                if type(match.__getattribute__(attribute)) != type(Match().__getattribute__(attribute)):
+                    print(f"Erreur pour le {match.get_translation('fr')[attribute]} du match {match.ident}")
+                    print(f"{match.__getattribute__(attribute)} n'est pas de type {Match().__getattribute__(attribute)}")
+                    exit()
 
-    def get_players(self):
-        """get the whole list of players"""
-        return self.players
+                if not isinstance(match.data[0], list) or match.data[0][0] not in players_data.keys():
+                    print(f"Les informations concernant le premier joueur du match sont incorrectes")
+                    exit()
 
-    @staticmethod
-    def save_players(players):
-        with open("data/players", "rb") as file_players:
-            already_saved_files = pickle.load(file_players)
-        already_saved_files.update(players)
-        with open("data/players", "wb") as file_players:
-            pickle.dump(already_saved_files, file_players)
 
-    def load_players(self):
-        with open("data/players", "rb") as file_players:
-            self.players = pickle.load(file_players)
-        return self.players
