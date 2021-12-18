@@ -45,14 +45,6 @@ class DataManager:
                 rounds[round[0]].add_player_score(player)
         return rounds
 
-    def verify_rounds(self, rounds):
-        for round in rounds.values():
-            for attribute in Round().__dict__:
-                if type(round.__getattribute__(attribute)) != type(Round().__getattribute__(attribute)):
-                    print(f"Erreur pour le {round.get_translation('fr')[attribute]} de la ronde {round.name}")
-                    print(f"{round.__getattribute__(attribute)} n'est pas de type {Round().__getattribute__(attribute)}")
-                    exit()
-
     def get_tournaments(self, tournaments):
         for tournament in tournaments_data.items():
             tournaments[tournament[0]] = Tournament()
@@ -94,16 +86,5 @@ class DataManager:
             matchs[match[0]].data = ([match[1][0][0], match[1][0][1]], [match[1][1][0], match[1][1][1]])
         return matchs
 
-    def verify_matchs(self, matchs):
-        for match in matchs.values():
-            for attribute in Match().__dict__:
-                if type(match.__getattribute__(attribute)) != type(Match().__getattribute__(attribute)):
-                    print(f"Erreur pour le {match.get_translation('fr')[attribute]} du match {match.ident}")
-                    print(f"{match.__getattribute__(attribute)} n'est pas de type {Match().__getattribute__(attribute)}")
-                    exit()
-
-                if not isinstance(match.data[0], list) or match.data[0][0] not in players_data.keys():
-                    print(f"Les informations concernant le premier joueur du match sont incorrectes")
-                    exit()
 
 

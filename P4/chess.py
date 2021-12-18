@@ -28,7 +28,6 @@ for player1, player2 in zip(halves[0], halves[1]):
     matchs[str(num_match)] = Match()
     matchs[str(num_match)].ident = str(num_match)
     matchs[str(num_match)].data = ([player1, 0], [player2, 0])
-    dm.verify_matchs(matchs)
     num_match +=1
 
 if len(rounds["1"].players) % 2 != 0:
