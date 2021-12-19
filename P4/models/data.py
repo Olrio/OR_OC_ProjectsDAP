@@ -6,7 +6,7 @@ from models.tournament import Tournament
 from models.match import Match
 from data.simulation import players_data, rounds_data, tournaments_data, matchs_data
 
-class DataManager:
+class DataLoader:
     def __init__(self):
         pass
 
@@ -32,20 +32,20 @@ class DataManager:
                 print(f"Le sexe du joueur {player} doit être 'M' ou 'F'")
                 exit()
 
-    def get_rounds(self, rounds):
+    def get_rounds(self, rounds, matchs, players):
         for round in rounds_data.items():
             rounds[round[0]] = Round()
             rounds[round[0]].ident = round[0]
             rounds[round[0]].name = round[1][0]
-            rounds[round[0]].players = round[1][1]
+            rounds[round[0]].players = [players[x] for x in round[1][1]]
             rounds[round[0]].scores = round[1][2]
-            rounds[round[0]].matchs = round[1][3]
+            rounds[round[0]].matchs = [matchs[x] for x in round[1][3]]
             rounds[round[0]].start = datetime.datetime(round[1][4][0], round[1][4][1], round[1][4][2], round[1][4][3], round[1][4][4], round[1][4][5])
             for player in round[1][1]:
                 rounds[round[0]].add_player_score(player)
         return rounds
 
-    def get_tournaments(self, tournaments):
+    def get_tournaments(self, tournaments, rounds, players):
         for tournament in tournaments_data.items():
             tournaments[tournament[0]] = Tournament()
             tournaments[tournament[0]].ident = tournament[0]
@@ -60,8 +60,8 @@ class DataManager:
             tournaments[tournament[0]].description = tournament[1][7]
             tournaments[tournament[0]].system = tournament[1][8]
             tournaments[tournament[0]].nb_rounds = tournament[1][9]
-            tournaments[tournament[0]].rounds = tournament[1][10]
-            tournaments[tournament[0]].players = tournament[1][11]
+            tournaments[tournament[0]].rounds = [rounds[x] for x in tournament[1][10]]
+            tournaments[tournament[0]].players = [players[x] for x in tournament[1][11]]
             tournaments[tournament[0]].singleton = tournament[1][12]
         return tournaments
 
@@ -79,11 +79,11 @@ class DataManager:
                     print(f"Le type de partie du tournoi {tournament.name} doit être 'bullet', 'blitz' ou 'rapid'")
                     exit()
 
-    def get_matchs(self, matchs):
+    def get_matchs(self, matchs, players):
         for match in matchs_data.items():
             matchs[match[0]] = Match()
             matchs[match[0]].ident = match[0]
-            matchs[match[0]].data = ([match[1][0][0], match[1][0][1]], [match[1][1][0], match[1][1][1]])
+            matchs[match[0]].data = ([players[match[1][0][0]], match[1][0][1]], [players[match[1][1][0]], match[1][1][1]])
         return matchs
 
 

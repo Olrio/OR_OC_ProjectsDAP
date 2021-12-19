@@ -15,6 +15,6 @@ players_data = {"1": ("Prof", "Albert", 1, (1975, 5, 17), "M"),
 rounds_data = {"1": ("Round 1", ["2", "3", "4", "5", "6", "8", "9", "10", "11"], {}, [], (2021, 12, 10, 15, 10, 30))}  # (name, players, scores, matchs, time_start)
 
 # name, town, country, starting date, ending date, status, control time, description, system, nb rounds, rounds, players, singleton
-tournaments_data = {"1": ("Europe Grand Masters", "Paris", "France", (2022,7,14), (2022, 7, 16), "upcoming", "rapid", "", "swiss", 4, [], ["2", "3", "4", "5", "6", "8", "9", "10", "11"], [])}
+tournaments_data = {"1": ("Europe Grand Masters", "Paris", "France", (2022,7,14), (2022, 7, 16), "in progress", "rapid", "", "swiss", 4, ["1"], ["2", "3", "4", "5", "6", "8", "9", "10", "11"], [])}
 
 matchs_data = {}  # data format = {id: ([player1, score1], [player2, score2])}
