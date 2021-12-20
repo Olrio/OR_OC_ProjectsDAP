@@ -21,6 +21,9 @@ class Tournament:
         self.players: list = None  # list of players identifiants. To get Player instances
         self.singleton: list = None  # list of floating players when number of players is odd
 
+    def __str__(self):
+        return f"{self.name:<30}{self.town:<20}{self.country:<10}"
+
     def get_translation(self, lang):
         if lang == "fr":
             return {
@@ -31,7 +34,7 @@ class Tournament:
                 "date_start": "Date de début",
                 "date_end": "Date de fin",
                 "status": "Statut",
-                "nb_rounds": "Nombre de rounds",
+                "nb_rounds": "Nombre de rondes",
                 "control_time": "Type de partie",
                 "description": "Commentaires",
                 "system": "Système",
@@ -43,3 +46,11 @@ class Tournament:
             if round.name == t_round.name:
                 return
         self.rounds.append(round)
+
+    def add_player(self, player):
+        if player not in self.players:
+            self.players.append(player)
+
+    def remove_player(self, player):
+        if player in self.players:
+            self.players.remove(player)

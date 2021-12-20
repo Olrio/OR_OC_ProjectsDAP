@@ -1,52 +1,51 @@
-import time
 
 from models.data import DataLoader
-from models.match import Match
-from models.round import Round
 from view.view import View
+from models.crud import Crud
 
 class MainController:
-    """Global management of the app"""
+    """
+    Global management of the app
+    MainController interacts with MenuManager
+    and MenuManager interacts with DataManager
+    """
     def __init__(self):
-        self.tournament = None
-        # instance sub controllers
+        # instance sub controller
         self.mm = MenuManager()
-        self.dm = DataManager()
 
     def run(self):
-        # loading all existing data
+        # launching program
         self.mm.run()
-        self.dm.get_data()
-        # getting current tournament. May be created or chosen in the database
-        self.tournament = self.mm.load_or_create_tournament(self.dm.tournaments)
+        #self.mm.run_home()
+        self.run_tournament()
+
+    def run_tournament(self):
+        # MainController needs a tournament. It may be created or chosen in the database
+        # This tournament must have players
+        tournament = self.mm.load_or_create_tournament()
         # running tournament
-        if self.tournament.system == "swiss":
-            self.run_swiss_first_round(self.tournament)
+        if tournament.system == "swiss":
+            self.run_swiss_first_round(tournament)
         else:
             self.run_other_system()
 
+    def run_player(self):
+        print("Menu Joueur")
+        exit()
+
+    def run_reports(self):
+        print("Menu Rapports")
+        exit()
+
     def run_swiss_first_round(self, tournament):
+        # create a first round if needed
+        if len(tournament.rounds) == 0:
+            self.mm.dm.create_round(tournament, self.mm.dm.rounds)
         # display players participating in the tournament
         # players are sorted by score then by rank
         self.mm.show_players_in_tournament(tournament)
-        # first round
-        # players are distributed in two halves
-        halves = tournament.rounds[0].two_halves(tournament.rounds[0].players, tournament)
-        # generating matchs of the first round
-        num_match = len(self.dm.matchs) + 1
-        for player1, player2 in zip(halves[0], halves[1]):
-            self.dm.matchs[str(num_match)] = Match()
-            self.dm.matchs[str(num_match)].ident = str(num_match)
-            self.dm.matchs[str(num_match)].data = ([player1, 0.0], [player2, 0.0])
-            tournament.rounds[0].add_match(self.dm.matchs[str(num_match)])
-            num_match += 1
-        # manage floating player if number of players is odd
-        if len(tournament.rounds[0].players) % 2 != 0:
-            self.dm.matchs[str(num_match)] = Match()
-            self.dm.matchs[str(num_match)].ident = str(num_match)
-            self.dm.matchs[str(num_match)].data = ([tournament.singleton[-1], 0.0], [None, None])
-            tournament.rounds[0].add_match(self.dm.matchs[str(num_match)])
-            num_match += 1
+        # creating matchs for the first round
+        self.mm.dm.create_matchs_swiss_first_round(tournament)
         # manage matchs of the first round
         self.mm.matchs_of_the_round(tournament)
         # display ranking at the end of the round
@@ -57,104 +56,127 @@ class MainController:
 
     def run_swiss_following_rounds(self, tournament):
         while len(tournament.rounds) != tournament.nb_rounds:
-            # each match has a unique identifiant and is stored in self.dm.matchs
-            # matchs is a list of the matchs belonging to the next round
-            num_match = len(self.dm.matchs) + 1
-            matchs = []
-            first_players = list(tournament.players)
-            second_players = list(tournament.players)
-            rev_i = -1
-            if len(tournament.players) % 2 != 0:
-                # if number of players is odd, a singleton is identified
-                while tournament.players[rev_i] in tournament.singleton:
-                    rev_i -= 1
-                tournament.singleton.append(tournament.players[rev_i])
-                first_players.remove(tournament.singleton[-1])
-                second_players.remove(tournament.singleton[-1])
-
-            while first_players:
-                second_players.remove(second_players[0])
-                x = 0
-                appairing = 0
-
-                while appairing == 0:  # a player can't play twice against the same opponent
-                    flag = 0
-                    self.dm.matchs[str(num_match)] = Match()
-                    self.dm.matchs[str(num_match)].ident = str(num_match)
-                    self.dm.matchs[str(num_match)].data = ([first_players[0], 0.0], [second_players[x], 0.0])
-                    for t_round in tournament.rounds:
-                        for past_match in t_round.matchs:
-                            if (
-                                    self.dm.matchs[str(num_match)].data[0][0] == past_match.data[0][0]
-                                    and self.dm.matchs[str(num_match)].data[1][0] == past_match.data[1][0]
-                                    or self.dm.matchs[str(num_match)].data[0][0] == past_match.data[1][0]
-                                    and self.dm.matchs[str(num_match)].data[1][0] == past_match.data[0][0]
-                            ):
-                                if len(first_players) > 2:  # if no other possibility, player will play twice an opponent
-                                    x += 1
-                                    flag = 1
-                                    break
-                    if flag == 0:
-                        appairing = 1
-
-                matchs.append(self.dm.matchs[str(num_match)])  # only when appairing is correct
-                first_players.remove(first_players[0])
-                first_players.remove(second_players[x])
-                second_players.remove(second_players[x])
-                num_match += 1
-            if len(tournament.players) % 2 != 0:  # adding a match with singleton
-                self.dm.matchs[str(num_match)] = Match()
-                self.dm.matchs[str(num_match)].ident = str(num_match)
-                self.dm.matchs[str(num_match)].data = ([tournament.singleton[-1], 0.0], [None, None])
-                matchs.append(self.dm.matchs[str(num_match)])
-
-            num_round = len(self.dm.rounds) + 1
-            self.dm.rounds[str(num_round)] = Round()  # create the new round
-            self.dm.rounds[str(num_round)].ident = str(num_round)
-            self.dm.rounds[str(num_round)].name = "Round "+str(num_round)
-            self.dm.rounds[str(num_round)].players = tournament.players
-            self.dm.rounds[str(num_round)].scores = dict()
-            for player in self.dm.rounds[str(num_round)].players:
-                self.dm.rounds[str(num_round)].scores[player.ident] = tournament.rounds[-1].scores[player.ident]
-            self.dm.rounds[str(num_round)].matchs = matchs
-            self.dm.rounds[str(num_round)].get_start_time()
-            tournament.add_round(self.dm.rounds[str(num_round)])  # the new round is added to the tournament
+            self.mm.dm.create_matchs_swiss_following_round(tournament)
             self.mm.matchs_of_the_round(tournament)
             self.mm.show_players_in_tournament(tournament)
 
 
 def run_other_system(self):
-        print("A implémenter ...")
+        print("Coming soon ...")
         exit()
 
 
 class MenuManager:
-    """Management of the choices of the user"""
+    """
+    Management of the choices of the user
+    i.e. views and menus
+    """
     def __init__(self):
         pass
 
     def run(self):
         self.ui = View()
         self.ui.home()
+        self.dm = DataManager()
+        self.dm.get_database()
 
-    def load_or_create_tournament(self, tournaments):
+    def run_home(self):
+        valid_choice = ["T", "P", "R", "Q"]
         choice = ""
-        while choice.upper() not in ["L", "C"]:
+        while choice.upper() not in valid_choice:
+            choice = self.ui.menu_home()
+        if choice.upper() == "Q":
+            exit()
+        elif choice.upper() == "T":
+            pass
+        elif choice.upper() == "P":
+            pass
+        elif choice.upper() == "R":
+            pass
+
+
+    def load_or_create_tournament(self):
+        choice = ""
+        while choice.upper() not in ["L", "C", "Q", "H"]:
             choice = self.ui.load_or_create_tournament()
+        if choice.upper() == "Q":
+            exit()
+        if choice.upper() == "H":
+            exit()
         if choice.upper() == "L":
-            print(f"OK, on charge la liste des tournois. Il n'y a actuellement que {tournaments['1'].name}")
+            tournament = self.load_tournament()
         else:
-            print(f"Création pas prête, on va prendre un tournoi existant : {tournaments['1'].name}")
-        input()
-        # so whatever the choice is, we suppose user chose to load the tournament Europe Grand Masters which ident is '1'
-        return tournaments['1']
+            data = self.ui.get_data_new_tournament()
+            tournament = self.dm.create_tournament(data, self.dm.tournaments)
+        # if no player in tournament, add some
+        if not tournament.players:
+            self.ui.no_player_in_tournament(tournament)
+            self.how_add_players_to_tournament(tournament)
+        return tournament
+
+    def how_add_players_to_tournament(self, tournament):
+        choice = ""
+        while choice.upper() not in ["L", "C", "H", "Q"]:
+            choice = self.ui.load_or_create_player()
+        if choice.upper() == "Q":
+            exit()
+        if choice.upper() == "H":
+            exit()
+        if choice.upper() == "L":
+            self.load_player_for_tournament(tournament)
+        else:
+            data = self.ui.get_data_new_player()
+            player = self.dm.create_player(data, self.dm.players)
+            self.dm.add_or_remove_a_player_to_tournament(player.ident, tournament)
+        choice = ""
+        while choice.upper() not in ["Y", "N"]:
+            choice = self.ui.add_another_player()
+        if choice.upper() == "Y":
+            self.how_add_players_to_tournament(tournament)
+        else:
+            if len(tournament.players) >= 2:
+                return tournament
+            else:
+                self.ui.not_enought_players_in_tournament(tournament)
+                self.how_add_players_to_tournament(tournament)
+
+    def load_tournament(self):
+        valid_choice = ["C"]
+        t_choice = ""
+        for tournament in self.dm.tournaments.values():
+            valid_choice.append(tournament.ident)
+        while t_choice.upper() not in valid_choice:
+            t_choice = self.ui.display_all_tournaments(self.dm.tournaments)
+        if t_choice.upper() == "C":
+            self.load_or_create_tournament()
+        else:
+            return self.dm.load_tournament(t_choice)
+
+
+    def load_player_for_tournament(self, tournament):
+        valid_choice = ["C", "N"]
+        p_choice = ""
+        for player in self.dm.players.values():
+            valid_choice.append(player.ident)
+        while p_choice.upper() not in valid_choice:
+            p_choice = self.ui.display_all_players(self.dm.players, tournament)
+        if p_choice.upper() == "C":
+            while tournament.players:
+                self.dm.add_or_remove_a_player_to_tournament(tournament.players[-1].ident, tournament)
+            self.how_add_players_to_tournament(tournament)
+        elif p_choice.upper() == "N":
+            return
+        else:
+            self.dm.add_or_remove_a_player_to_tournament(p_choice, tournament)
+            self.load_player_for_tournament(tournament)
+
 
     def show_players_in_tournament(self, tournament):
-        text = f"au {tournament.rounds[-1].name}"
+        text = f"pour la ronde {len(tournament.rounds)}"
         for match in tournament.rounds[-1].matchs:
             if match.data[0][1] == 0 and match.data[1][1] == 0: # round not ended
                 break
-            text = f"à l'issue du {tournament.rounds[-1].name} - Fin de la ronde :{tournament.rounds[-1].end}"
+            text = f"à l'issue de la ronde {len(tournament.rounds)} - Fin de la ronde :{tournament.rounds[-1].end}"
         tournament.rounds[-1].players = tournament.rounds[0].sort_players(tournament.rounds[-1].players)
         tournament.players = tournament.rounds[-1].sort_players(tournament.players)
         self.ui.show_players_in_tournament(tournament, text)
@@ -207,10 +229,97 @@ class DataManager:
         self.matchs = None
         self.rounds = None
         self.tournaments = None
+        self.crud = Crud()
 
-    def get_data(self):
+    def get_database(self):
         '''loading players, matchs, rounds, tournaments from database'''
         self.players = DataLoader().get_players(dict())
         self.matchs = DataLoader().get_matchs(dict(), self.players)
         self.rounds = DataLoader().get_rounds(dict(), self.matchs, self.players)
         self.tournaments = DataLoader().get_tournaments(dict(), self.rounds, self.players)
+
+    def create_tournament(self, data, tournaments):
+        tournament = self.crud.create_tournament(data, tournaments)
+        return tournament
+
+    def create_player(self, data, players):
+        player = self.crud.create_player(data, players)
+        return player
+
+    def create_round(self, tournament, rounds):
+        round = self.crud.create_round(tournament, rounds)
+        # a round has to be added to a tournament
+        tournament.add_round(round)
+        return tournament
+
+    def create_matchs_swiss_first_round(self, tournament):
+        # players are distributed in two halves
+        halves = tournament.rounds[0].two_halves(tournament.rounds[0].players, tournament)
+        # generating matchs of the first round
+        num_match = len(self.matchs) + 1
+        for player1, player2 in zip(halves[0], halves[1]):
+            match = self.crud.create_match(self.matchs, player1, player2)
+            tournament.rounds[0].add_match(match)
+        # manage floating player if number of players is odd
+        if len(tournament.rounds[0].players) % 2 != 0:
+            match = self.crud.create_match(self.matchs, tournament.singleton[-1], None, score2=None)
+            tournament.rounds[0].add_match(match)
+
+    def create_matchs_swiss_following_round(self, tournament):
+        # each match has a unique identifiant and is stored in self.matchs
+        # matchs is a list of the matchs belonging to the next round
+        matchs = []
+        first_players = list(tournament.players)
+        second_players = list(tournament.players)
+        rev_i = -1
+        if len(tournament.players) % 2 != 0:
+            # if number of players is odd, a singleton is identified
+            while tournament.players[rev_i] in tournament.singleton:
+                rev_i -= 1
+            tournament.singleton.append(tournament.players[rev_i])
+            first_players.remove(tournament.singleton[-1])
+            second_players.remove(tournament.singleton[-1])
+
+        while first_players:
+            second_players.remove(second_players[0])
+            x = 0
+            appairing = 0
+
+            while appairing == 0:  # a player can't play twice against the same opponent
+                flag = 0
+                match = self.crud.create_match(self.matchs, first_players[0], second_players[x])
+                for t_round in tournament.rounds:
+                    for past_match in t_round.matchs:
+                        if (
+                                match.data[0][0] == past_match.data[0][0]
+                                and match.data[1][0] == past_match.data[1][0]
+                                or match.data[0][0] == past_match.data[1][0]
+                                and match.data[1][0] == past_match.data[0][0]
+                        ):
+                            if len(first_players) > 2:  # if no other possibility, player will play twice an opponent
+                                x += 1
+                                flag = 1
+                                break
+                if flag == 0:
+                    appairing = 1
+
+            matchs.append(match)  # only when appairing is correct
+            first_players.remove(first_players[0])
+            first_players.remove(second_players[x])
+            second_players.remove(second_players[x])
+        if len(tournament.players) % 2 != 0:  # adding a match with singleton
+            match = self.crud.create_match(self.matchs, tournament.singleton[-1], None, score2=None)
+            matchs.append(match)
+
+        round = self.crud.create_round(tournament, self.rounds)
+        round.matchs = matchs
+        tournament.add_round(round)  # the new round is added to the tournament
+
+    def add_or_remove_a_player_to_tournament(self, player_ident, tournament):
+        if self.players[player_ident] in tournament.players:
+            tournament.remove_player(self.players[player_ident])
+        else:
+            tournament.add_player(self.players[player_ident])
+
+    def load_tournament(self, tournament_id):
+        return self.tournaments[tournament_id]
