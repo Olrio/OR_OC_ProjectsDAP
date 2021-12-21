@@ -16,8 +16,8 @@ class MainController:
     def run(self):
         # launching program
         self.mm.run()
-        #self.mm.run_home()
-        self.run_tournament()
+        choice = self.mm.run_home()
+        eval(choice)
 
     def run_tournament(self):
         # MainController needs a tournament. It may be created or chosen in the database
@@ -88,7 +88,7 @@ class MenuManager:
         if choice.upper() == "Q":
             exit()
         elif choice.upper() == "T":
-            pass
+            return "self.run_tournament()"
         elif choice.upper() == "P":
             pass
         elif choice.upper() == "R":
@@ -102,7 +102,7 @@ class MenuManager:
         if choice.upper() == "Q":
             exit()
         if choice.upper() == "H":
-            exit()
+            mavaleur = "H"
         if choice.upper() == "L":
             tournament = self.load_tournament()
         else:
