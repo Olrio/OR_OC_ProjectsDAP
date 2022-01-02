@@ -9,15 +9,16 @@ import datetime
 class Round:
     def __init__(self, name=None, ident=None):
         """ensemble des parties jouées durant une ronde"""
-        self.name: str = name
-        self.scores: dict = None  # dict of identifiants of the players participating in the round and their score in the round
-        self.players: list = None
-        self.matchs: list = None  # list of identifiants of the matchs in the round
-        self.ident: str = ident
-        self.start: datetime.datetime = None  # datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        self.end: datetime.datetime = None
+        self.name = name
+        self.scores = None  # dict of identifiants of the players in the round and their score in the round
+        self.players = None
+        self.matchs = None
+        self.ident = ident
+        self.start = None
+        self.end = None
 
-    def get_translation(self, lang):
+    @staticmethod
+    def get_translation(lang):
         if lang == "fr":
             return {
                 "name": "Nom",
@@ -26,6 +27,9 @@ class Round:
                 "matchs": "Liste des matchs",
                 "ident": "Identifiant",
             }
+
+    def set_new_value(self, param, value):
+        self.__setattr__(param, value)
 
     def add_player_score(self, player):
         if player not in self.scores:
@@ -40,7 +44,8 @@ class Round:
         s_players = sorted(s_players, key=lambda x: self.scores[x.ident], reverse=True)
         return s_players
 
-    def two_halves(self, players, tournament):
+    @staticmethod
+    def two_halves(players, tournament):
         # distribute players in best half and lowest half
         first_half = players.copy()
         second_half = []
@@ -74,7 +79,7 @@ class Round:
         match.data[1][1] = 0.0
 
     def get_start_time(self):
-        self.start = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.start = datetime.datetime.now()
 
     def get_end_time(self):
-        self.end = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self.end = datetime.datetime.now()

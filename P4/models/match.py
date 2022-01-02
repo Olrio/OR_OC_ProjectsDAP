@@ -5,23 +5,32 @@ correspondant à une partie entre deux joueurs
 
 import random
 
+
 class Match:
     def __init__(self):
         """Partie entre deux joueurs"""
-        self.data: tuple = None  # format = ([player1, score1], [player2, score2])
-        self.ident: str = None
+        self.data = None  # format = ([player1, score1], [player2, score2])
+        self.ident = None
 
-    def get_translation(self, lang):
+    @staticmethod
+    def get_translation(lang):
         if lang == "fr":
             return {
                 "data": "Informations sur le match",
-                "ident": "Identifiant du match"
+                "ident": "Identifiant du match",
             }
+
     def __repr__(self):
         if self.data[1][0]:
-            return f"Match entre {self.data[0][0].firstname} {self.data[0][0].lastname} et {self.data[1][0].firstname} {self.data[1][0].lastname}"
+            return (
+                f"Match entre {self.data[0][0].firstname} {self.data[0][0].lastname}"
+                f" et {self.data[1][0].firstname} {self.data[1][0].lastname}"
+            )
         else:
             return f"Joueur flottant : {self.data[0][0].firstname} {self.data[0][0].lastname}"
+
+    def set_new_value(self, param, value):
+        self.__setattr__(param, value)
 
     def set_draw(self):
         self.data[0][1] += 0.5
@@ -35,7 +44,9 @@ class Match:
 
     def random_result(self):
         if not self.data[1][0]:
-            print(f"Match N° {self.ident} : Le joueur flottant {self.data[0][0]} marque 1 point")
+            print(
+                f"Match N° {self.ident} : Le joueur flottant {self.data[0][0]} marque 1 point"
+            )
             self.data[0][1] += 1
         else:
             print(f"Match N° {self.ident} : {self.data[0][0]} vs {self.data[1][0]}")
